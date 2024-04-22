@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Wordly
 
-## Getting Started
+Wordly is a fun and engaging word game built with React, TypeScript, and JavaScript.
 
-First, run the development server:
+## Installation
+
+Before you start, make sure you have Node.js and npm installed on your machine.
+
+1. Clone this repository:
+
+    ```bash
+    git clone https://github.com/AymanAkashi/wordly
+    ```
+
+2. Navigate into the project directory
+
+    ```bash
+    cd wordly
+    ```
+
+3. Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+## Usage
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then, open your web browser and navigate to [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Game Rules
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+#### Goal:
 
-## Learn More
+Guess a five-letter word within six tries.
 
-To learn more about Next.js, take a look at the following resources:
+#### GamePlay:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<img src='./public/wordly.png' alt='world game mode' width='300px' height='300px' >
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. You start with a blank grid of five empty squares.
+2. You guess a valid five-letter word and submit it.
+3. The game provides color-coded feedback for each letter of your guess:
 
-## Deploy on Vercel
+-   Green: The letter is correct and in the right position.
+-   Yellow: The letter is in the word, but in the wrong position.
+-   Gray: The letter is not in the word at all.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+4. Use the color clues to refine your next guess.
+5. You have six tries in total to guess the correct word.
