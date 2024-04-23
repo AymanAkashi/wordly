@@ -26,7 +26,7 @@ Before you start, make sure you have Node.js and npm installed on your machine.
 ## Usage
 
 ```bash
-npm start
+npm run build && npm start
 ```
 
 Then, open your web browser and navigate to [http://localhost:3000](http://localhost:3000).
