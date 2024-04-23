@@ -10,6 +10,10 @@
     animation: shake 0.5s;
 }
 
+.rotate-cell {
+    animation: rotate-cell 0.9s;
+}
+
 @keyframes shake {
     0% {
         transform: scale(0.8);
@@ -31,5 +35,15 @@
     }
     100% {
         transform: scale(1);
+    }
+}
+
+/* rotate Z  */
+@keyframes rotate-cell {
+    0% {
+        transform: rotateY(0deg);
+    }
+    100% {
+        transform: rotateY(180deg);
     }
 }

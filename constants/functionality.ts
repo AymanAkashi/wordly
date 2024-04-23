@@ -2,60 +2,72 @@ import { Cell, MyCells } from "@/lib/types";
 import { rows, wordLength } from "@/constants/constent";
 import { generateWord } from "./generateWord";
 import Cells from "@/components/cells";
+import { validWord } from "./valid-word";
+import { setupGrid } from "./setup-game";
 
 export const resetGame = ({
     setGrid,
     setGuess,
     setWord,
+    setGame,
     setCurrentCharIndex,
     setCurrentRowIndex,
-    setError,
+    setNotif,
 }: {
     setGrid: (prevGrid: MyCells[][]) => void;
     setGuess: (guess: string) => void;
     setWord: (word: string) => void;
+    setGame: (game: "on" | "win" | "lose") => void;
     setCurrentCharIndex: (index: number) => void;
     setCurrentRowIndex: (index: number) => void;
-    setError: (error: string) => void;
+    setNotif: (error: string) => void;
 }) => {
     setGrid(
         Array.from({ length: rows }, () =>
             Array(wordLength).fill({ key: "", value: "no" })
         )
     );
+
+    for (let i = 0; i < 26; i++) {
+        const key = document.getElementById(
+            `kbd-${String.fromCharCode(97 + i)}`
+        );
+        if (key) {
+            key.classList.remove("bg-yellow-500");
+            key.classList.remove("bg-red-500");
+            key.classList.remove("bg-green-500");
+        }
+    }
     setGuess("");
+    setGame("on");
     setWord(generateWord(wordLength));
     setCurrentCharIndex(0);
     setCurrentRowIndex(0);
-    setError("");
+    setNotif("");
 };
 
 export const moveNextCell = ({
     currentRowIndex,
-    rows,
-    word,
     setCurrentRowIndex,
     setCurrentCharIndex,
-    setError,
+    setGame,
+    setModal,
 }: {
     currentRowIndex: number;
-    rows: number;
-    word: string;
     setCurrentRowIndex: (index: number) => void;
     setCurrentCharIndex: (index: number) => void;
-    setError: any;
+    setGame: (game: "on" | "win" | "lose") => void;
+    setModal: (modal: boolean) => void;
 }) => {
     if (currentRowIndex === rows - 1) {
-        setError("You don't find the word. correct word is: " + word);
+        setGame("lose");
+        setModal(true);
         setCurrentRowIndex(rows);
+        return;
     } else {
         setCurrentRowIndex(currentRowIndex + 1);
     }
     setCurrentCharIndex(0);
-    const cell = document.getElementById(`${currentRowIndex}-${0}`);
-    if (cell) {
-        cell.focus();
-    }
 };
 
 export const DeleteLetter = ({
@@ -139,4 +151,57 @@ export const AddLetter = ({
     if (cell) {
         cell.style.animation = "shake 0.5s";
     }
+};
+
+export const handleWord = async ({
+    word,
+    guess,
+    setGame,
+    setModal,
+    setGrid,
+    currentRowIndex,
+    setCurrentRowIndex,
+    setCurrentCharIndex,
+    setNotif,
+    setGuess,
+}: {
+    word: string;
+    guess: string;
+    setGame: any;
+    setModal: any;
+    setGrid: any;
+    currentRowIndex: number;
+    setCurrentRowIndex: any;
+    setCurrentCharIndex: any;
+    setNotif: any;
+    setGuess: any;
+}) => {
+    if (guess.length !== wordLength) {
+        setNotif("Word length is not correct");
+        return;
+    }
+    if (!(await validWord(guess))) {
+        setNotif("Word is not correct");
+        return;
+    }
+    if (
+        setupGrid({
+            word,
+            guess,
+            setGame,
+            setModal,
+            setGrid,
+            currentRowIndex,
+        })
+    ) {
+        return;
+    }
+    setGuess("");
+    moveNextCell({
+        currentRowIndex,
+        setCurrentRowIndex,
+        setCurrentCharIndex,
+        setGame,
+        setModal,
+    });
 };

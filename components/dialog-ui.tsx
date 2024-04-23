@@ -15,15 +15,16 @@ const ConstactSend = () => {
             <input
                 type="email"
                 placeholder="Email"
-                className="px-2 rounded-xl"
+                className="px-2 py-1 rounded-xl"
             />
             <textarea
                 placeholder="Message"
-                className="px-1 rounded-xl"
+                className="px-2 rounded-xl resize-y"
+                maxLength={150}
             ></textarea>
             <button
                 type="submit"
-                className="rounded-full px-2 bg-neutral-800 hover:bg-sky-400 hover:scale-105 transition-all duration-100 delay-75"
+                className="rounded-full  px-2 bg-neutral-800 hover:bg-sky-400 hover:scale-105 transition-all duration-100 delay-75"
             >
                 Send
             </button>
@@ -87,7 +88,9 @@ const DialogUi = ({
                     </button>
                 </div>
             </DialogTrigger>
-            <DialogContent className="flex flex-col justify-center items-center shadow-[0_0_20px_#ffffff44] w-[90%] h-4/5 sm:h-auto sm:w-auto overflow-scroll rounded-2xl">
+            <DialogContent
+                className={`flex flex-col justify-center items-center shadow-[0_0_20px_#ffffff44] w-[90%] h-4/5 sm:h-auto sm:w-auto rounded-2xl overflow-auto`}
+            >
                 <DialogHeader>
                     <DialogTitle className="text-4xl">
                         {dialogItems.title}

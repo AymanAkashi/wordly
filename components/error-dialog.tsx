@@ -13,7 +13,6 @@ export const ErrorDialog = ({
     useEffect(() => {
         const interval = setInterval(() => {
             setCount(count + 100);
-            console.log("count: ", count);
             if (count >= timeout) {
                 setError("");
                 clearInterval(interval);

@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const Cells = ({
@@ -11,6 +12,10 @@ const Cells = ({
         currentRowIndex: number;
     };
 }) => {
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+        }
+    });
     return (
         <div>
             <div
