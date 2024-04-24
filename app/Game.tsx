@@ -69,6 +69,13 @@ const Game = () => {
                     setCurrentCharIndex,
                 });
             } else if (e.key === "Enter") {
+                const key = document.getElementById("kbd-enter");
+                if (key) {
+                    key.classList.add("bg-sky-500");
+                    setTimeout(() => {
+                        key.classList.remove("bg-sky-500");
+                    }, 200);
+                }
                 handleWord({
                     word,
                     guess,
@@ -82,6 +89,13 @@ const Game = () => {
                     setGuess,
                 });
             } else if (e.key === "Backspace") {
+                const key = document.getElementById("kbd-delete");
+                if (key) {
+                    key.classList.add("bg-sky-500");
+                    setTimeout(() => {
+                        key.classList.remove("bg-sky-500");
+                    }, 200);
+                }
                 DeleteLetter({
                     guess,
                     setGuess,
@@ -125,6 +139,7 @@ const Game = () => {
             <Keyboard />
             {guess.length === wordLength &&
                 guess.length === wordLength &&
+                game === "on" &&
                 !notif && <span className="text-lg"> Press Enter </span>}
         </main>
     );

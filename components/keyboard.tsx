@@ -24,9 +24,11 @@ const Keyboard = () => {
         setGame,
         setModal,
         setNotif,
+        game,
     } = useContext(GameContext);
 
     const handleClick = (e: any) => {
+        if (game !== "on") return;
         const newChar = e.target.innerText.toLowerCase();
         if (guess.length >= wordLength) {
             return;
@@ -41,6 +43,7 @@ const Keyboard = () => {
         });
     };
     const handleEnter = () => {
+        if (game !== "on") return;
         handleWord({
             word,
             guess,
@@ -55,6 +58,7 @@ const Keyboard = () => {
         });
     };
     const handleDelete = () => {
+        if (game !== "on") return;
         DeleteLetter({
             guess,
             setGuess,
