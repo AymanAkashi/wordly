@@ -63,8 +63,8 @@ const DialogPlay = ({
                     <Image
                         src="/wordly.png"
                         alt="wordly"
-                        width="100"
-                        height="100"
+                        width="300"
+                        height="300"
                     />
                 </DialogHeader>
                 <DialogDescription>

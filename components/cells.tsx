@@ -10,6 +10,7 @@ const Cells = ({
         charIndex: number;
         char: { key: string; value: string };
         currentRowIndex: number;
+        className?: string;
     };
 }) => {
     useEffect(() => {
@@ -23,7 +24,7 @@ const Cells = ({
                 key={`${props.rowIndex}-${props.charIndex}`}
                 id={`${props.rowIndex}-${props.charIndex}`}
                 className={cn(
-                    `square size-12 text-3xl sm:size-16 sm:text-4xl lg:size-20 lg:text-5xl  text-center flex justify-center items-center ${
+                    `square size-12 text-3xl sm:size-16 sm:text-4xl lg:size-20 lg:text-5xl  text-center flex justify-center items-center transition-all delay-75 duration-100 ${
                         props.rowIndex === props.currentRowIndex
                             ? "dark:bg-neutral-400 bg-neutral-300"
                             : "dark:bg-neutral-600/70 bg-neutral-100/70"
@@ -34,7 +35,8 @@ const Cells = ({
                             : props.char.value === "yes"
                             ? "dark:bg-green-400 bg-green-500 "
                             : ""
-                    }`
+                    }`,
+                    `${props.className && props.className}`
                 )}
                 // disabled={props.rowIndex !== props.currentRowIndex}
             >

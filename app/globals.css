@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes rotate-image {
+    0% {
+        transform: perspective(400px) rotate3d(1, -1, -100, -8deg);
+    }
+    100% {
+        transform: perspective(400px) rotate3d(200, 200, -100, 20deg);
+    }
+}
+
+.rotate-image {
+    transform: perspective(400px) scaleX(1) scaleY(1) scaleZ(1) rotateX(36deg)
+        rotateY(-16deg) rotateZ(-8deg) translateX(0px) translateY(0px)
+        translateZ(51px) skewX(-14deg) skewY(27deg);
+    background-image: linear-gradient(transparent, #fff, transparent),
+        url("/public/main.png");
+    /* transform: perspective(400px) rotate3d(300, -10, -50, 30deg); */
+}
+
 .square {
     border-radius: 4px;
 }

@@ -180,7 +180,7 @@ export const handleWord = async ({
         setNotif("Word length is not correct");
         return;
     }
-    if (!(await validWord(guess))) {
+    if (!(await validWord(guess)) && word !==    guess) {
         setNotif("Word is not correct");
         return;
     }
