@@ -29,12 +29,12 @@ const updateColors = (key: string, color: string) => {
 const checkMatch = (
     word: string[],
     guess: string[],
-    setGrid: (prev: MyCells[][]) => void,
+    setGrid: (prev: any) => void,
     currentRowIndex: number
 ) => {
     for (let i = 0; i < word.length; i++) {
         if (word[i] === guess[i]) {
-            setGrid((prevGrid: MyCells[][]) => {
+            setGrid((prevGrid: any) => {
                 return updateGrid(prevGrid, "yes", {
                     row: currentRowIndex,
                     col: i,
@@ -47,7 +47,7 @@ const checkMatch = (
             word.includes(guess[i]) &&
             word[word.indexOf(guess[i])] !== guess[word.indexOf(guess[i])]
         ) {
-            setGrid((prevGrid: MyCells[][]) => {
+            setGrid((prevGrid: any) => {
                 return updateGrid(prevGrid, "check", {
                     row: currentRowIndex,
                     col: i,
@@ -80,13 +80,13 @@ export const setupGrid = ({
     guess: string;
     setGame: any;
     setModal: any;
-    setGrid: (prev: MyCells[][]) => void;
+    setGrid: (prev: any) => void;
     currentRowIndex: number;
 }) => {
     if (word === guess) {
         setGame("win");
         setModal(true);
-        setGrid((prevGrid: MyCells[][]) => {
+        setGrid((prevGrid: any) => {
             const newGrid = [...prevGrid];
             for (let i = 0; i < wordLength; i++) {
                 updateGrid(newGrid, "yes", { row: currentRowIndex, col: i });
