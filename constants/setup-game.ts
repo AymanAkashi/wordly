@@ -1,5 +1,72 @@
-import { match } from "assert";
 import { rows, wordLength } from "./constent";
+import { Cell, MyCells } from "@/lib/types";
+
+const updateGrid = (
+    prev: MyCells[][],
+    value: Cell,
+    indx: { row: number; col: number }
+) => {
+    const newGrid = [...prev];
+    newGrid[indx.row][indx.col] = newGrid[indx.row][indx.col] = {
+        ...newGrid[indx.row][indx.col],
+        value: value,
+    };
+    return newGrid;
+};
+
+const updateColors = (key: string, color: string) => {
+    const k = document.getElementById(`kbd-${key}`);
+    if (k) {
+        k.classList.forEach((c) => {
+            if (c.includes("bg-")) {
+                k.classList.remove(c);
+            }
+        });
+        k.classList.add(color);
+    }
+};
+
+const checkMatch = (
+    word: string[],
+    guess: string[],
+    setGrid: (prev: MyCells[][]) => void,
+    currentRowIndex: number
+) => {
+    for (let i = 0; i < word.length; i++) {
+        if (word[i] === guess[i]) {
+            setGrid((prevGrid: MyCells[][]) => {
+                return updateGrid(prevGrid, "yes", {
+                    row: currentRowIndex,
+                    col: i,
+                });
+            });
+            updateColors(word[i], "bg-green-500");
+            word[i] = " ";
+            guess[i] = ".";
+        } else if (
+            word.includes(guess[i]) &&
+            word[word.indexOf(guess[i])] !== guess[word.indexOf(guess[i])]
+        ) {
+            setGrid((prevGrid: MyCells[][]) => {
+                return updateGrid(prevGrid, "check", {
+                    row: currentRowIndex,
+                    col: i,
+                });
+            });
+            updateColors(guess[i], "bg-yellow-500");
+            word[word.indexOf(guess[i])] = " ";
+            guess[i] = ".";
+        } else {
+            setGrid((prevGrid: any) => {
+                return updateGrid(prevGrid, "no", {
+                    row: currentRowIndex,
+                    col: i,
+                });
+            });
+            updateColors(guess[i], "bg-red-500");
+        }
+    }
+};
 
 export const setupGrid = ({
     word,
@@ -13,19 +80,16 @@ export const setupGrid = ({
     guess: string;
     setGame: any;
     setModal: any;
-    setGrid: any;
+    setGrid: (prev: MyCells[][]) => void;
     currentRowIndex: number;
 }) => {
     if (word === guess) {
         setGame("win");
         setModal(true);
-        setGrid((prevGrid: any) => {
+        setGrid((prevGrid: MyCells[][]) => {
             const newGrid = [...prevGrid];
             for (let i = 0; i < wordLength; i++) {
-                newGrid[currentRowIndex][i] = {
-                    ...newGrid[currentRowIndex][i],
-                    value: "yes",
-                };
+                updateGrid(newGrid, "yes", { row: currentRowIndex, col: i });
             }
             return newGrid;
         });
@@ -39,54 +103,7 @@ export const setupGrid = ({
         return true;
     }
     const tmp = word.split("");
-    const newGuess = guess.split("");
-    for (let i = 0; i < newGuess.length; i++) {
-        if (!tmp.includes(newGuess[i])) {
-            const key = document.getElementById(`kbd-${newGuess[i]}`);
-            if (key) {
-                key.classList.add("bg-red-500");
-            }
-        }
-    }
-    for (let i = 0; i < tmp.length; i++) {
-        if (tmp[i] == newGuess[i]) {
-            setGrid((prevGrid: any) => {
-                const newGrid = [...prevGrid];
-                newGrid[currentRowIndex][i] = {
-                    ...newGrid[currentRowIndex][i],
-                    value: "yes",
-                };
-                return newGrid;
-            });
-            const key = document.getElementById(`kbd-${tmp[i]}`);
-            if (key) {
-                key.classList.remove("bg-transparent");
-                key.classList.remove("bg-red-500");
-                key.classList.remove("bg-yellow-500");
-                key.classList.add("bg-green-500");
-            }
-            tmp[i] = " ";
-            newGuess[i] = ".";
-        }
-    }
-    for (let i = 0; i < newGuess.length; i++) {
-        if (tmp.includes(newGuess[i])) {
-            setGrid((prevGrid: any) => {
-                const newGrid = [...prevGrid];
-                newGrid[currentRowIndex][i] = {
-                    ...newGrid[currentRowIndex][i],
-                    value: "check",
-                };
-                return newGrid;
-            });
-            const key = document.getElementById(`kbd-${newGuess[i]}`);
-            if (key && !key.classList.contains("bg-green-500")) {
-                key.classList.add("bg-yellow-500");
-            }
-            tmp[tmp.indexOf(newGuess[i])] = " ";
-            newGuess[i] = ".";
-        }
-    }
+    checkMatch(word.split(""), guess.split(""), setGrid, currentRowIndex);
 
     if (currentRowIndex === rows - 1) {
         setGame("lose");
