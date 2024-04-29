@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import localFont from "next/font/local";
 import "./globals.css";
 import { NavBar } from "@/components/navbar";
@@ -18,18 +20,27 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className="dark">
-            <body
-                className={`${TechnoRacer.className} min-h-screen w-full flex flex-col justify-normal items-center bg-gradient-to-bl from-white to-gray-400 dark:from-black dark:to-gray-800 text-black dark:text-white transition-all delay-75 duration-100`}
-            >
-                <ContextProvider>
-                    <ThemeProvider>
-                        <NavBar />
-                        {children}
-                        <div></div>
-                    </ThemeProvider>
-                </ContextProvider>
-            </body>
-        </html>
+        <ClerkProvider
+            appearance={{
+                baseTheme: dark,
+                variables: {
+                    colorPrimary: "#22c55e",
+                },
+            }}
+        >
+            <html lang="en" className="dark">
+                <body
+                    className={`${TechnoRacer.className} min-h-screen w-full flex flex-col justify-center items-center bg-gradient-to-bl from-white to-gray-400 dark:from-black dark:to-gray-800 text-black dark:text-white transition-all delay-75 duration-100 overflow-hidden`}
+                >
+                    <ContextProvider>
+                        <ThemeProvider>
+                            {/* <NavBar /> */}
+                            {children}
+                            {/* <div></div> */}
+                        </ThemeProvider>
+                    </ContextProvider>
+                </body>
+            </html>
+        </ClerkProvider>
     );
 }
