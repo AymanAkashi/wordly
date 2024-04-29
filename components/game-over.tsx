@@ -17,6 +17,8 @@ const GameOver = () => {
         setCurrentCharIndex,
         setGame,
         setNotif,
+        setTimer,
+        setHeart,
     } = useContext(GameContext);
 
     return (
@@ -69,6 +71,8 @@ const GameOver = () => {
                                 setWord,
                                 setGame,
                                 setNotif,
+                                setTimer,
+                                setHeart,
                             });
                             setModal(false);
                         }}

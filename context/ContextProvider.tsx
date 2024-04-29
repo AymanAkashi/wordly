@@ -22,6 +22,10 @@ export const GameContext = createContext({
     setGame: (game: GameState) => {},
     notif: "",
     setNotif: (error: string) => {},
+    timer: 0,
+    setTimer: (timer: number) => {},
+    heart: 3,
+    setHeart: (heart: number) => {},
 });
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -38,6 +42,8 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [modal, setModal] = useState(false);
     const [game, setGame] = useState<GameState>("on");
     const [notif, setNotif] = useState("");
+    const [heart, setHeart] = useState(3);
+    const [timer, setTimer] = useState(-1);
     return (
         <GameContext.Provider
             value={{
@@ -57,6 +63,10 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
                 setGame,
                 notif,
                 setNotif,
+                heart,
+                setHeart,
+                timer,
+                setTimer,
             }}
         >
             {children}

@@ -4,6 +4,7 @@ import Cells from "@/components/cells";
 import { ErrorDialog } from "@/components/error-dialog";
 import { generateWord } from "@/constants/generateWord";
 import { rows, wordLength } from "@/constants/constent";
+import { FaHeart } from "react-icons/fa6";
 import {
     moveNextCell,
     DeleteLetter,
@@ -16,7 +17,21 @@ import { GameContext } from "@/context/ContextProvider";
 import { setupGrid } from "@/constants/setup-game";
 import Keyboard from "@/components/keyboard";
 
-const Game = () => {
+const Hearts = ({ heart }: { heart: number }) => {
+    return (
+        <div className="flex justify-center items-center space-x-12">
+            Heart:{" "}
+            <span className="relative flex justify-center items-center  px-2 py-1 w-8 h-8">
+                <FaHeart className="absolute left-0 flex justify-center items-center text-red-500 w-full h-full" />
+                <div className=" absolute z-20 flex justify-center items-center text-xl">
+                    {heart}
+                </div>
+            </span>
+        </div>
+    );
+};
+
+const Game = ({ mode }: { mode: string }) => {
     const {
         word,
         setWord,
@@ -34,7 +49,25 @@ const Game = () => {
         setGame,
         notif,
         setNotif,
+        heart,
+        setHeart,
+        setTimer,
+        timer,
     } = useContext(GameContext);
+
+    useEffect(() => {
+        console.log(timer);
+        if (timer === -1 || game !== "on") return;
+        if (timer === 0 || heart === 0) {
+            setGame("lose");
+            setModal(true);
+            return;
+        }
+        const interval = setInterval(() => {
+            setTimer((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timer]);
 
     useEffect(() => {
         if (word == "") {
@@ -50,6 +83,8 @@ const Game = () => {
                 guess.length < wordLength &&
                 currentCharIndex < wordLength
             ) {
+                if (timer === -1)
+                    setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
                 const key = document.getElementById("kbd-" + e.key);
                 if (key) {
                     key.classList.add("bg-sky-500");
@@ -87,6 +122,7 @@ const Game = () => {
                     setCurrentCharIndex,
                     setNotif,
                     setGuess,
+                    setHeart,
                 });
             } else if (e.key === "Backspace") {
                 const key = document.getElementById("kbd-delete");
@@ -113,7 +149,7 @@ const Game = () => {
     }, [currentCharIndex, grid]);
 
     return (
-        <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8">
+        <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8 rel relative">
             <div className="grid grid-cols-5 gap-1 relative">
                 {grid.map((row, rowIndex) =>
                     row.map((char, charIndex) => (
@@ -135,6 +171,19 @@ const Game = () => {
                     </div>
                 )}
                 {modal && <GameOver />}
+            </div>
+            <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
+                <span>
+                    Time left:{" "}
+                    <span
+                        className={` ${
+                            timer === -1 && "underline text-green-400"
+                        }`}
+                    >
+                        {timer !== -1 ? timer : "Click To start"}
+                    </span>
+                </span>
+                <Hearts heart={heart} />
             </div>
             <Keyboard />
             {guess.length === wordLength &&

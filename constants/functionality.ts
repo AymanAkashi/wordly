@@ -13,6 +13,8 @@ export const resetGame = ({
     setCurrentCharIndex,
     setCurrentRowIndex,
     setNotif,
+    setTimer,
+    setHeart,
 }: {
     setGrid: (prevGrid: MyCells[][]) => void;
     setGuess: (guess: string) => void;
@@ -21,6 +23,8 @@ export const resetGame = ({
     setCurrentCharIndex: (index: number) => void;
     setCurrentRowIndex: (index: number) => void;
     setNotif: (error: string) => void;
+    setTimer: (timer: number) => void;
+    setHeart: (heart: number) => void;
 }) => {
     setGrid(
         Array.from({ length: rows }, () =>
@@ -38,6 +42,8 @@ export const resetGame = ({
             key.classList.remove("bg-green-500");
         }
     }
+    setTimer(-1);
+    setHeart(3);
     setGuess("");
     setGame("on");
     setWord(generateWord(wordLength));
@@ -164,6 +170,7 @@ export const handleWord = async ({
     setCurrentCharIndex,
     setNotif,
     setGuess,
+    setHeart,
 }: {
     word: string;
     guess: string;
@@ -175,13 +182,15 @@ export const handleWord = async ({
     setCurrentCharIndex: any;
     setNotif: any;
     setGuess: any;
+    setHeart: any;
 }) => {
     if (guess.length !== wordLength) {
         setNotif("Word length is not correct");
         return;
     }
-    if (!(await validWord(guess)) && word !==    guess) {
-        setNotif("Word is not correct");
+    if (!(await validWord(guess)) && word !== guess) {
+        setNotif("Word is not correct you lose a heart❤️");
+        setHeart((prevHeart: number) => prevHeart - 1);
         return;
     }
     if (
