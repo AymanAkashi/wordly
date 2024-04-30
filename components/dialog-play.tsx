@@ -29,6 +29,8 @@ const DialogPlay = ({
         setWord,
         setGame,
         setNotif,
+        setTimer,
+        setHeart,
     } = useContext(GameContext);
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -81,6 +83,8 @@ const DialogPlay = ({
                                 setWord,
                                 setGame,
                                 setNotif,
+                                setTimer,
+                                setHeart,
                             });
                             setOpen(false);
                         }}
