@@ -25,6 +25,7 @@ const Keyboard = () => {
         setModal,
         setNotif,
         game,
+        setHeart,
     } = useContext(GameContext);
 
     const handleClick = (e: any) => {
@@ -55,6 +56,7 @@ const Keyboard = () => {
             setCurrentCharIndex,
             setNotif,
             setGuess,
+            setHeart,
         });
     };
     const handleDelete = () => {

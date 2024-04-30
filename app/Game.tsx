@@ -64,7 +64,7 @@ const Game = ({ mode }: { mode: string }) => {
             return;
         }
         const interval = setInterval(() => {
-            setTimer((prev) => prev - 1);
+            setTimer(timer - 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [timer]);
