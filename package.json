@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "node server.js",
+        "dev": "nodemon server.js",
         "build": "next build",
         "start": "NODE_ENV=production node server.js",
         "lint": "next lint"
@@ -13,6 +13,7 @@
         "@clerk/themes": "^2.1.0",
         "@nextui-org/react": "^2.3.5",
         "@radix-ui/react-dialog": "^1.0.5",
+        "@radix-ui/react-dropdown-menu": "^2.0.6",
         "@radix-ui/react-progress": "^1.0.3",
         "@react-three/drei": "^9.105.4",
         "@react-three/fiber": "^8.16.2",
