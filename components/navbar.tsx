@@ -5,6 +5,15 @@ import Image from "next/image";
 import DialogUi from "@/components/dialog-ui";
 import { About, contact } from "@/components/navbar-constent";
 import DialogPlay from "./dialog-play";
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSection,
+    DropdownTrigger,
+} from "@nextui-org/react";
+import { FaUserAlt } from "react-icons/fa";
+import Menu from "./Menu";
 
 export const NavBar = () => {
     const [open, setOpen] = useState(false);
@@ -20,7 +29,7 @@ export const NavBar = () => {
             <div>
                 <ul className="flex justify-evenly items-center">
                     <li className="p-4 hover:translate-x-2 hover:-translate-y-2 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-75">
-                        <DialogPlay open={open} setOpen={setOpen} />
+                        <DialogPlay />
                     </li>
 
                     <li className="p-4 hover:translate-x-2 hover:-translate-y-2 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-75">
@@ -31,7 +40,7 @@ export const NavBar = () => {
                     </li>
                 </ul>
             </div>
-            <DarkMode />
+            <Menu />
         </nav>
     );
 };

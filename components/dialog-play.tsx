@@ -7,19 +7,13 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogDescription,
 } from "./ui/dialog";
 import { useContext, useState } from "react";
 import { GiConsoleController } from "react-icons/gi";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import Image from "next/image";
 
-const DialogPlay = ({
-    open,
-    setOpen,
-}: {
-    open: boolean;
-    setOpen: (open: boolean) => void;
-}) => {
+const DialogPlay = () => {
     const {
         game,
         setGrid,
@@ -33,26 +27,26 @@ const DialogPlay = ({
         setHeart,
     } = useContext(GameContext);
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
             <DialogTrigger asChild>
                 <div>
                     <button
                         type="button"
                         title={game === "on" ? "New Game" : "Play"}
-                        className="hover:translate-x-1 hover:-translate-y-1 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-76 sm:inline-block hidden"
+                        className=" hover:text-sky-500 cursor-pointer transition-all duration-100 delay-76 sm:inline-block hidden"
                     >
                         {game === "on" ? "New Game" : "Play"}
                     </button>
                     <button
                         type="button"
                         title={game === "on" ? "New Game" : "Play"}
-                        className="hover:translate-x-1 hover:-translate-y-1 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-76 inline-block sm:hidden"
+                        className=" hover:text-sky-500 cursor-pointer transition-all duration-100 delay-76 inline-block sm:hidden"
                     >
                         <GiConsoleController className="h-8 w-8" />
                     </button>
                 </div>
             </DialogTrigger>
-            <DialogContent className="flex flex-col justify-center items-center space-y-4 w-4/5 sm:w-auto rounded-2xl shadow-sm dark:shadow-gray-400 shadow-gray-900 bg-gray-200">
+            <DialogContent className="flex flex-col justify-center items-center space-y-4 w-4/5 sm:w-auto rounded-2xl shadow-md dark:shadow-gray-400/25 shadow-gray-900 bg-gray-200">
                 <DialogTitle className="flex justify-center items-center flex-col">
                     <p className="font-sans text-xl w-4/5 text-center">
                         Find the word and improve your{" "}
@@ -86,7 +80,6 @@ const DialogPlay = ({
                                 setTimer,
                                 setHeart,
                             });
-                            setOpen(false);
                         }}
                     >
                         New Game

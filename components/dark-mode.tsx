@@ -23,7 +23,7 @@ const DarkMode = () => {
     });
     return (
         <button
-            className="p-1 rounded-full shadow-md  transition-colors duration-100 delay-75 hover:shadow-lg dark:hover:shadow-lg hover:scale-105 dark:hover:text-yellow-500 hover:text-sky-950"
+            className="p-1 rounded-full shadow-md  transition-colors duration-100 delay-75 "
             type="button"
             title={`Switch to ${darkMode ? "light" : "dark"} mode`}
             onClick={() => {
@@ -31,13 +31,7 @@ const DarkMode = () => {
                 document.documentElement.classList.toggle("dark");
                 setDarkMode((prev) => !prev);
             }}
-        >
-            {darkMode != null && darkMode ? (
-                <FiMoon className="h-6 w-6 sm:w-8 sm:h-8" />
-            ) : (
-                <FiSun className="h-6 w-6 sm:w-8 sm:h-8" />
-            )}
-        </button>
+        ></button>
     );
 };
 
