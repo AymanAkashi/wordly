@@ -1,33 +1,45 @@
 "use client";
 import React, { useEffect } from "react";
 import Cells from "@/components/cells";
-import { Image } from "@nextui-org/react";
+import { Canvas } from "@react-three/fiber";
 import { generateWord } from "@/constants/generateWord";
+import Cube from "./Cube";
+import { OrbitControls } from "@react-three/drei";
+import { redirect } from "next/navigation";
 
-const Home = ({ setHide }: { setHide: (hide: boolean) => void }) => {
-    const generate = () => {
-        const ret: { word: string; value: string }[] = [];
-        const values = ["yes", "no", "check"];
-        const alphabets = generateWord(6);
-        for (let i = 0; i < 6; i++) {
-            ret.push({
-                word: alphabets[i],
-                value: values[Math.floor(Math.random() * values.length)],
-            });
-        }
-        return ret;
-    };
+const Home = () => {
+    // const generate = () => {
+    //     const ret: { word: string; value: string }[] = [];
+    //     const values = ["yes", "no", "check"];
+    //     const alphabets = generateWord(6);
+    //     for (let i = 0; i < 6; i++) {
+    //         ret.push({
+    //             word: alphabets[i],
+    //             value: values[Math.floor(Math.random() * values.length)],
+    //         });
+    //     }
+    //     return ret;
+    // };
 
-    const [word, setWord] = React.useState<{ word: string; value: string }[]>(
-        generate()
-    );
+    const [redi, setRedi] = React.useState(false);
+    const [word, setWord] = React.useState<{ word: string; value: string }[]>([
+        { word: "W", value: "yes" },
+        { word: "O", value: "no" },
+        { word: "R", value: "check" },
+        { word: "D", value: "yes" },
+        { word: "L", value: "no" },
+        { word: "Y", value: "check" },
+    ]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setWord(generate());
-        }, 800);
-        return () => clearInterval(interval);
-    }, []);
+        // const interval = setInterval(() => {
+        //     setWord(generate());
+        // }, 800);
+        // return () => clearInterval(interval);
+        if (redi) {
+            redirect("/auth/sign-in");
+        }
+    }, [redi]);
 
     return (
         <div
@@ -87,23 +99,30 @@ const Home = ({ setHide }: { setHide: (hide: boolean) => void }) => {
                         }}
                     />
                 </div>
-                <p className="text-lg font-mono text-clip indent-12">
-                    Improve your vocabulary by playing this game. You will be
-                    given a word and you have to guess the word by typing the
-                    correct word. You can also delete the word by pressing the
-                    backspace key.
+                <p className="text-lg font-mono text-clip">
+                    <span className="text-4xl ">I</span>mprove your vocabulary
+                    by playing this game. You will be given a word and you have
+                    to guess the word by typing the correct word. You can also
+                    delete the word by pressing the backspace key.
                 </p>
                 <div className="w-full grid place-content-center ">
                     <button
                         className="bg-orange-500 hover:bg-green-500 transition-all delay-75 duration-100 text-white px-4 py-2 mt-4 rounded-md flex-auto"
                         onClick={() => {
-                            setHide(true);
+                            setRedi(true);
+                            console.log("redirect");
                         }}
                     >
-                        Click meee
+                        Play Now
                     </button>
                 </div>
             </div>
+            <Canvas>
+                <ambientLight intensity={2.5} />
+                <OrbitControls enableZoom={false} enablePan={false} />
+                <directionalLight position={[2, 1, -4]} />
+                <Cube />
+            </Canvas>
         </div>
     );
 };
