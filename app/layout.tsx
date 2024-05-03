@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { dark } from "@clerk/themes";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -36,6 +37,7 @@ export default function RootLayout({
                         <ThemeProvider>
                             {/* <NavBar /> */}
                             {children}
+                            <SpeedInsights />
                             {/* <div></div> */}
                         </ThemeProvider>
                     </ContextProvider>
