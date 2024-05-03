@@ -12,42 +12,57 @@ const page = ({ params }: { params: { mode: string } }) => {
     if (mode.startsWith("1")) {
         return <Game mode={mode} />;
     }
+    const [isConnected, setIsConnected] = useState(false);
+    const [transport, setTransport] = useState("N/A");
+    const [message, setMessage] = useState("");
+    const [myInput, setMyInput] = useState("");
     useEffect(() => {
-        if (socket.connected) {
-            onConnect();
-        }
-
-        async function onConnect() {
-            console.log("connected");
-            socket.emit("game", { mode });
-            const data = await fetch(`/api/matching`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    id: socket.id,
-                    name: "player",
-                    status: "join",
-                    typeGame: "single",
-                    multiPlayer: mode,
-                    Players: socket.id,
-                }),
-            });
-            console.log(data.json());
-        }
-
-        function onDisconnect() {}
-
-        socket.on("connect", onConnect);
-        socket.on("disconnect", onDisconnect);
-
+        socket.on("connection", () => {
+            setIsConnected(true);
+            setTransport(socket.io.engine.transport.name);
+        });
+        socket.on("disconnect", () => {
+            setIsConnected(false);
+        });
+        socket.on("message", (data: { user: string; message: string }) => {
+            setMessage(`${data.user}: ${data.message}`);
+        });
         return () => {
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
+            socket.off("connection");
+            socket.off("message");
+            // socket.disconnect();
         };
     }, []);
-    return <div>Hello World!</div>;
+
+    const handleClick = (e: any) => {
+        // socket.emit("click", `clicked ${myInput}`);
+        console.log("click");
+    };
+
+    return (
+        <div className="flex flex-col justify-center items-start">
+            Hello World! {isConnected ? "connected" : "disconnected"}{" "}
+            {transport}
+            <div>{message}</div>
+            <label htmlFor="myinput">write message</label>
+            <input
+                id="myinput"
+                type="text"
+                value={myInput}
+                onChange={(e) => setMyInput(e.target.value)}
+                className="text-black bg-white border-2 border-black rounded-2xl px-2 py-1 w-40"
+            />
+            <button
+                type="button"
+                title="click me"
+                onClick={handleClick}
+                className="px-2 bg-yellow-300 rounded-2xl hover:scale-110"
+            >
+                {" "}
+                Click me
+            </button>
+        </div>
+    );
 };
 
 export default page;
