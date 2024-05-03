@@ -124,7 +124,7 @@ export default function Menu() {
                         />
                     </DropdownItem>
                     <DropdownItem key="dashboard">
-                        <DialogPlay open={open} setOpen={setOpen} />
+                        <DialogPlay />
                     </DropdownItem>
                     <DropdownItem key="settings">Settings</DropdownItem>
                     <DropdownItem
