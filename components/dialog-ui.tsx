@@ -57,6 +57,8 @@ const AboutGame = () => {
 
 const DialogUi = ({
     dialogItems,
+    open,
+    setOpenedDialog,
 }: {
     dialogItems: {
         icon: JSX.Element;
@@ -66,54 +68,53 @@ const DialogUi = ({
         image?: string;
         Component?: JSX.Element;
     };
+    open: boolean;
+    setOpenedDialog: React.Dispatch<React.SetStateAction<boolean[]>>;
 }) => {
-    const { Component } = dialogItems;
+    console.log("open: ", open);
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <div>
-                    <button
-                        type="button"
-                        title={dialogItems.title}
-                        className="hidden sm:inline-block"
-                    >
-                        {dialogItems.title}
-                    </button>
-                    <button
-                        className="inline-block h-8 w-8 sm:hidden"
-                        type="button"
-                        title={dialogItems.title}
-                    >
-                        {dialogItems.icon}
-                    </button>
-                </div>
-            </DialogTrigger>
-            <DialogContent
-                className={`flex flex-col justify-center items-center shadow-[0_0_20px_#ffffff44] w-[90%] h-4/5 sm:h-auto sm:w-auto rounded-2xl overflow-auto`}
+        <div>
+            <Dialog
+                open={open}
+                onOpenChange={(value) => {
+                    setOpenedDialog((prev) => {
+                        const newOpenedDialog = [...prev];
+                        newOpenedDialog[dialogItems.title == "About" ? 0 : 1] =
+                            value;
+                        return newOpenedDialog;
+                    });
+                }}
             >
-                <DialogHeader>
-                    <DialogTitle className="text-4xl">
-                        {dialogItems.title}
-                    </DialogTitle>
-                    <DialogDescription className="text-xl">
-                        {dialogItems.description}
-                    </DialogDescription>
-                </DialogHeader>
-                {dialogItems.image && (
-                    <div className="w-1/2 h-1/2">
-                        <img src={dialogItems.image} alt={dialogItems.title} />
+                <DialogContent
+                    className={`flex flex-col justify-center items-center shadow-[0_0_20px_#ffffff44] w-[90%] h-4/5 sm:h-auto sm:w-auto rounded-2xl overflow-auto`}
+                >
+                    <DialogHeader>
+                        <DialogTitle className="text-4xl">
+                            {dialogItems.title}
+                        </DialogTitle>
+                        <DialogDescription className="text-xl">
+                            {dialogItems.description}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {dialogItems.image && (
+                        <div className="w-1/2 h-1/2">
+                            <img
+                                src={dialogItems.image}
+                                alt={dialogItems.title}
+                            />
+                        </div>
+                    )}
+                    <div className="p-4 font-thin font-sans">
+                        <p>{dialogItems.content}</p>
                     </div>
-                )}
-                <div className="p-4 font-thin font-sans">
-                    <p>{dialogItems.content}</p>
-                </div>
-                {dialogItems.title === "About" ? (
-                    <AboutGame />
-                ) : (
-                    <ConstactSend />
-                )}
-            </DialogContent>
-        </Dialog>
+                    {dialogItems.title === "About" ? (
+                        <AboutGame />
+                    ) : (
+                        <ConstactSend />
+                    )}
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 };
 

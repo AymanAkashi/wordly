@@ -1,19 +1,45 @@
 import React, { useEffect, useState } from "react";
 import {
-    Dropdown,
-    DropdownTrigger,
     DropdownMenu,
-    DropdownSection,
-    DropdownItem,
-    Button,
-    User,
-    Avatar,
-} from "@nextui-org/react";
-import { SignedOut, useClerk } from "@clerk/nextjs";
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { HiOutlineStatusOffline, HiOutlineStatusOnline } from "react-icons/hi";
+import { SignOutButton, SignedOut, useClerk } from "@clerk/nextjs";
 import DialogPlay from "./dialog-play";
 import { useRouter } from "next/navigation";
 import DarkMode from "./dark-mode";
 import { FiMoon, FiSun } from "react-icons/fi";
+import { Avatar, Button, User } from "@nextui-org/react";
+import {
+    Cloud,
+    CreditCard,
+    Github,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    Settings,
+    UserPlus,
+    CircleUser,
+    Contact,
+    Gamepad2,
+} from "lucide-react";
+import { GrOfflineStorage } from "react-icons/gr";
+import DialogUi from "./dialog-ui";
+import { About } from "./navbar-constent";
 
 const PlusIcon = (props: any) => (
     <svg
@@ -39,8 +65,11 @@ const PlusIcon = (props: any) => (
     </svg>
 );
 
-export default function Menu() {
-    const { signOut } = useClerk();
+export default function Menu({
+    setOpenedDialog,
+}: {
+    setOpenedDialog: React.Dispatch<React.SetStateAction<boolean[]>>;
+}) {
     const router = useRouter();
     const [darkMode, setDarkMode] = React.useState<boolean>(false);
     const [open, setOpen] = useState(false);
@@ -69,107 +98,148 @@ export default function Menu() {
     }, []);
 
     return (
-        <Dropdown
-            showArrow
-            radius="sm"
-            classNames={{
-                base: "before:bg-default-200", // change arrow background
-                content:
-                    "p-0 border-small border-divider bg-background py-1 bg-gray-200 dark:bg-gray-800 rounded-md shadow-lg dark:shadow-white/15",
-            }}
-        >
-            <DropdownTrigger>
-                <Button variant="ghost" disableRipple>
-                    <Avatar
-                        size="lg"
-                        src="https://api.dicebear.com/8.x/lorelei/svg"
-                    />
-                </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-                aria-label="Custom item styles"
-                disabledKeys={["profile"]}
-                className="p-3"
-                itemClasses={{
-                    base: [
-                        "w-full rounded-md",
-                        "text-default-500",
-                        "transition-opacity",
-                        "data-[hover=true]:text-slate-400",
-                        "data-[hover=true]:bg-natur",
-                        "dark:data-[hover=true]:bg-neutral-900",
-                        "data-[selectable=true]:focus:bg-neutral-700",
-                        "data-[pressed=true]:opacity-70",
-                        "data-[focus-visible=true]:ring-default-500",
-                    ],
-                }}
-            >
-                <DropdownSection aria-label="Profile & Actions" showDivider>
-                    <DropdownItem
-                        isReadOnly
-                        key="profile"
-                        className="h-14 gap-2 cursor-default"
-                    >
-                        <User
-                            name="Junior Garcia"
-                            description="@jrgarciadev"
-                            classNames={{
-                                name: "text-default-600",
-                                description: "text-default-500",
-                            }}
-                            avatarProps={{
-                                size: "sm",
-                                src: "https://api.dicebear.com/8.x/lorelei/svg",
-                            }}
-                        />
-                    </DropdownItem>
-                    <DropdownItem key="dashboard">
-                        <DialogPlay />
-                    </DropdownItem>
-                    <DropdownItem key="settings">Settings</DropdownItem>
-                    <DropdownItem
-                        key="new_project"
-                        endContent={<PlusIcon className="text-large" />}
-                    >
-                        New Project
-                    </DropdownItem>
-                </DropdownSection>
-
-                <DropdownSection aria-label="Preferences">
-                    <DropdownItem
-                        key="theme"
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Avatar src="https://avatars.githubusercontent.com/u/45667409?v=4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel className="text-xl color-change">
+                    Akashi6
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                    <DropdownMenuItem className="cursor-pointer">
+                        <CircleUser className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                        <Keyboard className="mr-2 h-4 w-4" />
+                        <span>Keyboard shortcuts</span>
+                        <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <Gamepad2 className="mr-2 h-4 w-4" />
+                            <span>New Game</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        router.push("/game/1x1"); // Loading get Default setting game
+                                    }}
+                                >
+                                    <HiOutlineStatusOffline className="mr-2 h-4 w-4" />
+                                    <span>offline</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        router.push("/game/2x1"); // get Default setting game
+                                    }}
+                                >
+                                    <HiOutlineStatusOnline className="mr-2 h-4 w-4" />
+                                    <span>online</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        setOpenedDialog((prev: boolean[]) => {
+                                            const newState = [...prev];
+                                            newState[2] = true;
+                                            return newState;
+                                        });
+                                    }}
+                                >
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    <span>More...</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem
                         className="cursor-pointer"
-                        shortcut="⌘⌥D"
-                        closeOnSelect={false}
                         onClick={() => {
-                            localStorage.setItem(
-                                "theme",
-                                darkMode ? "light" : "dark"
-                            );
-                            document.documentElement.classList.toggle("dark");
-                            setDarkMode((prev) => !prev);
+                            setOpenedDialog((prev: boolean[]) => {
+                                const newState = [...prev];
+                                newState[2] = true;
+                                return newState;
+                            });
                         }}
                     >
-                        {darkMode != null && darkMode ? (
-                            <FiMoon className="h-6 w-6" />
-                        ) : (
-                            <FiSun className="h-6 w-6" />
-                        )}
-                    </DropdownItem>
-                </DropdownSection>
+                        <Plus className="mr-2 h-4 w-4" />
+                        <span>Customer Game</span>
+                        <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    key="theme"
+                    className="cursor-pointer"
+                    onClick={() => {
+                        localStorage.setItem(
+                            "theme",
+                            darkMode ? "light" : "dark"
+                        );
+                        document.documentElement.classList.toggle("dark");
+                        setDarkMode((prev) => !prev);
+                    }}
+                >
+                    {darkMode != null && darkMode ? (
+                        <FiMoon className="mr-2 h-4 w-4" />
+                    ) : (
+                        <FiSun className="mr-2 h-4 w-4" />
+                    )}
+                    <span>Dark Mode</span>
+                    <DropdownMenuShortcut>⌘⌥D</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
 
-                <DropdownSection aria-label="Help & Feedback">
-                    <DropdownItem key="help_and_feedback">
-                        Help & Feedback
-                    </DropdownItem>
-                    <DropdownItem
-                        key="logout"
-                        onClick={() => signOut(() => router.push("/"))}
-                    >
-                        Logout
-                    </DropdownItem>
-                </DropdownSection>
-            </DropdownMenu>
-        </Dropdown>
+                <DropdownMenuItem className="cursor-pointer">
+                    <LifeBuoy className="mr-2 h-4 w-4" />
+                    <span>Support</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => {
+                        console.log("clicked");
+                        setOpenedDialog((prev: boolean[]) => {
+                            const newState = [...prev];
+                            newState[0] = true;
+                            return newState;
+                        });
+                    }}
+                >
+                    <Contact className="mr-2 h-4 w-4" />
+                    <span>About</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => {
+                        console.log("clicked");
+                        setOpenedDialog((prev: boolean[]) => {
+                            const newState = [...prev];
+                            newState[1] = true;
+                            return newState;
+                        });
+                    }}
+                >
+                    <Contact className="mr-2 h-4 w-4" />
+                    <span>Contact</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Github className="mr-2 h-4 w-4" />
+                    <span>GitHub</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <SignOutButton>Log out</SignOutButton>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

@@ -14,9 +14,15 @@ import {
 } from "@nextui-org/react";
 import { FaUserAlt } from "react-icons/fa";
 import Menu from "./Menu";
+import { DialogCustomer } from "./dialog-customer";
 
 export const NavBar = () => {
-    const [open, setOpen] = useState(false);
+    const [openedDialog, setOpenedDialog] = useState<boolean[]>([
+        false,
+        false,
+        false,
+        false,
+    ]);
     return (
         <nav className=" w-full sm:w-3/5 h-auto flex justify-between items-center bg-transparent rounded-2xl mt-1 px-1">
             <Image
@@ -24,23 +30,23 @@ export const NavBar = () => {
                 alt="logo"
                 width={50}
                 height={50}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl"
+                className="w-12 h-12 flex items-center justify-center rounded-full"
             />
-            <div>
-                <ul className="flex justify-evenly items-center">
-                    <li className="p-4 hover:translate-x-2 hover:-translate-y-2 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-75">
-                        <DialogPlay />
-                    </li>
-
-                    <li className="p-4 hover:translate-x-2 hover:-translate-y-2 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-75">
-                        <DialogUi dialogItems={About} />
-                    </li>
-                    <li className="p-4 hover:translate-x-2 hover:-translate-y-2 hover:text-sky-500 cursor-pointer transition-all duration-100 delay-75">
-                        <DialogUi dialogItems={contact} />
-                    </li>
-                </ul>
-            </div>
-            <Menu />
+            <DialogUi
+                dialogItems={About}
+                open={openedDialog[0]}
+                setOpenedDialog={setOpenedDialog}
+            />
+            <DialogUi
+                dialogItems={contact}
+                open={openedDialog[1]}
+                setOpenedDialog={setOpenedDialog}
+            />
+            <DialogCustomer
+                open={openedDialog[2]}
+                setOpenedDialog={setOpenedDialog}
+            />
+            <Menu setOpenedDialog={setOpenedDialog} />
         </nav>
     );
 };

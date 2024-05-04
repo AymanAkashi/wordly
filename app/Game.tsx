@@ -56,7 +56,6 @@ const Game = ({ mode }: { mode: string }) => {
     } = useContext(GameContext);
 
     useEffect(() => {
-        console.log(timer);
         if (timer === -1 || game !== "on") return;
         if (timer === 0 || heart === 0) {
             setGame("lose");
