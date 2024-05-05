@@ -15,8 +15,9 @@ import {
 import { FaUserAlt } from "react-icons/fa";
 import Menu from "./Menu";
 import { DialogCustomer } from "./dialog-customer";
+import Link from "next/link";
 
-export const NavBar = () => {
+export const NavBar = async () => {
     const [openedDialog, setOpenedDialog] = useState<boolean[]>([
         false,
         false,
@@ -25,13 +26,15 @@ export const NavBar = () => {
     ]);
     return (
         <nav className=" w-full sm:w-3/5 h-auto flex justify-between items-center bg-transparent rounded-2xl mt-1 px-1">
-            <Image
-                src="/logo.png"
-                alt="logo"
-                width={50}
-                height={50}
-                className="w-12 h-12 flex items-center justify-center rounded-full"
-            />
+            <Link href={"/home"}>
+                <Image
+                    src="/logo.png"
+                    alt="logo"
+                    width={50}
+                    height={50}
+                    className="w-12 h-12 flex items-center justify-center rounded-full"
+                />
+            </Link>
             <DialogUi
                 dialogItems={About}
                 open={openedDialog[0]}
