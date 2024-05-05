@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import {
     DropdownMenu,
@@ -14,32 +15,21 @@ import {
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { HiOutlineStatusOffline, HiOutlineStatusOnline } from "react-icons/hi";
-import { SignOutButton, SignedOut, useClerk } from "@clerk/nextjs";
-import DialogPlay from "./dialog-play";
+import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import DarkMode from "./dark-mode";
 import { FiMoon, FiSun } from "react-icons/fi";
-import { Avatar, Button, User } from "@nextui-org/react";
+import { Avatar } from "@nextui-org/react";
 import {
-    Cloud,
-    CreditCard,
     Github,
     Keyboard,
     LifeBuoy,
     LogOut,
-    Mail,
-    MessageSquare,
     Plus,
     PlusCircle,
-    Settings,
-    UserPlus,
     CircleUser,
     Contact,
     Gamepad2,
 } from "lucide-react";
-import { GrOfflineStorage } from "react-icons/gr";
-import DialogUi from "./dialog-ui";
-import { About } from "./navbar-constent";
 
 const PlusIcon = (props: any) => (
     <svg
@@ -74,7 +64,6 @@ export default function Menu({
     const [darkMode, setDarkMode] = React.useState<boolean>(false);
     const [open, setOpen] = useState(false);
     const pressedKeys: { [key: string]: boolean } = {};
-
     useEffect(() => {
         window.addEventListener("keydown", (event) => {
             if (pressedKeys[event.key]) return;
@@ -99,7 +88,7 @@ export default function Menu({
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="cursor-pointer">
                 <Avatar src="https://avatars.githubusercontent.com/u/45667409?v=4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
@@ -122,7 +111,7 @@ export default function Menu({
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
+                        <DropdownMenuSubTrigger className="cursor-pointer">
                             <Gamepad2 className="mr-2 h-4 w-4" />
                             <span>New Game</span>
                         </DropdownMenuSubTrigger>
@@ -132,6 +121,7 @@ export default function Menu({
                                     onClick={() => {
                                         router.push("/game/1x1"); // Loading get Default setting game
                                     }}
+                                    className="cursor-pointer"
                                 >
                                     <HiOutlineStatusOffline className="mr-2 h-4 w-4" />
                                     <span>offline</span>
@@ -140,6 +130,7 @@ export default function Menu({
                                     onClick={() => {
                                         router.push("/game/2x1"); // get Default setting game
                                     }}
+                                    className="cursor-pointer"
                                 >
                                     <HiOutlineStatusOnline className="mr-2 h-4 w-4" />
                                     <span>online</span>
@@ -183,7 +174,7 @@ export default function Menu({
                     onClick={() => {
                         localStorage.setItem(
                             "theme",
-                            darkMode ? "light" : "dark"
+                            darkMode ? "light" : "dark",
                         );
                         document.documentElement.classList.toggle("dark");
                         setDarkMode((prev) => !prev);
@@ -204,6 +195,7 @@ export default function Menu({
                     <span>Support</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={() => {
                         console.log("clicked");
                         setOpenedDialog((prev: boolean[]) => {
@@ -217,6 +209,7 @@ export default function Menu({
                     <span>About</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={() => {
                         console.log("clicked");
                         setOpenedDialog((prev: boolean[]) => {
@@ -229,7 +222,12 @@ export default function Menu({
                     <Contact className="mr-2 h-4 w-4" />
                     <span>Contact</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                        router.push("https://www.github.com/AymanAkashi");
+                    }}
+                >
                     <Github className="mr-2 h-4 w-4" />
                     <span>GitHub</span>
                 </DropdownMenuItem>
