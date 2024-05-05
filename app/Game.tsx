@@ -92,7 +92,7 @@ const Game = ({ mode }: { mode: string }) => {
                     }, 200);
                 }
                 const newChar = String.fromCharCode(
-                    e.keyCode
+                    e.keyCode,
                 ).toLocaleLowerCase();
                 AddLetter({
                     newChar,
@@ -162,7 +162,7 @@ const Game = ({ mode }: { mode: string }) => {
                                 }}
                             />
                         </div>
-                    ))
+                    )),
                 )}
                 {notif && (
                     <div className="absolute inset-0 m-auto z-10 flex justify-center items-center">
@@ -176,7 +176,8 @@ const Game = ({ mode }: { mode: string }) => {
                     Time left:{" "}
                     <span
                         className={` ${
-                            timer === -1 && "underline text-green-400"
+                            timer === -1 &&
+                            "underline text-green-800 dark:text-green-400"
                         }`}
                     >
                         {timer !== -1 ? timer : "Click To start"}
@@ -188,7 +189,17 @@ const Game = ({ mode }: { mode: string }) => {
             {guess.length === wordLength &&
                 guess.length === wordLength &&
                 game === "on" &&
-                !notif && <span className="text-lg"> Press Enter </span>}
+                !notif && (
+                    <div className="text-lg fixed flex justify-center items-center bg-black/50 shadow-white/20 shadow-md text-white px-2 py-1 rounded-xl">
+                        {" "}
+                        Press Enter{" "}
+                        <img
+                            src="/enter.svg"
+                            alt="enter"
+                            className="size-12 text-white"
+                        />{" "}
+                    </div>
+                )}
         </main>
     );
 };

@@ -11,6 +11,15 @@
     }
 }
 
+@keyframes rotate-vd {
+    0% {
+        transform: perspective(800px) rotate3d(0, 0, 0, 0deg);
+    }
+    100% {
+        transform: perspective(800px) rotate3d(0, -10, 0, 30deg);
+    }
+}
+
 .rotate-image {
     transform: perspective(400px) scaleX(1) scaleY(1) scaleZ(1) rotateX(36deg)
         rotateY(-16deg) rotateZ(-8deg) translateX(0px) translateY(0px)

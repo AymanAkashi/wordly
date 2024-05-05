@@ -4,7 +4,7 @@ import { Cell, MyCells } from "@/lib/types";
 const updateGrid = (
     prev: MyCells[][],
     value: Cell,
-    indx: { row: number; col: number }
+    indx: { row: number; col: number },
 ) => {
     const newGrid = [...prev];
     newGrid[indx.row][indx.col] = newGrid[indx.row][indx.col] = {
@@ -30,14 +30,20 @@ const checkMatch = (
     word: string[],
     guess: string[],
     setGrid: (prev: any) => void,
-    currentRowIndex: number
+    currentRowIndex: number,
 ) => {
-    for (let i = 0; i < word.length; i++) {
+    let i = 0;
+    const interval = setInterval(() => {
+        const element = document.getElementById(`${currentRowIndex}-${i}`);
+        if (element) {
+            element.style.animation = "cell-win 0.5s";
+        }
+        const last = i;
         if (word[i] === guess[i]) {
             setGrid((prevGrid: any) => {
                 return updateGrid(prevGrid, "yes", {
                     row: currentRowIndex,
-                    col: i,
+                    col: last,
                 });
             });
             updateColors(word[i], "bg-green-500");
@@ -50,7 +56,7 @@ const checkMatch = (
             setGrid((prevGrid: any) => {
                 return updateGrid(prevGrid, "check", {
                     row: currentRowIndex,
-                    col: i,
+                    col: last,
                 });
             });
             updateColors(guess[i], "bg-yellow-500");
@@ -60,12 +66,15 @@ const checkMatch = (
             setGrid((prevGrid: any) => {
                 return updateGrid(prevGrid, "no", {
                     row: currentRowIndex,
-                    col: i,
+                    col: last,
                 });
             });
             updateColors(guess[i], "bg-red-500");
         }
-    }
+        if (i === wordLength - 1) {
+            clearInterval(interval);
+        } else i++;
+    }, 200);
 };
 
 export const setupGrid = ({
@@ -86,13 +95,6 @@ export const setupGrid = ({
     if (word === guess) {
         setGame("win");
         setModal(true);
-        setGrid((prevGrid: any) => {
-            const newGrid = [...prevGrid];
-            for (let i = 0; i < wordLength; i++) {
-                updateGrid(newGrid, "yes", { row: currentRowIndex, col: i });
-            }
-            return newGrid;
-        });
         for (let i = 0; i < wordLength; i++) {
             const key = document.getElementById(`kbd-${word[i]}`);
             if (key) {
@@ -100,6 +102,30 @@ export const setupGrid = ({
                 key.classList.add("bg-green-500");
             }
         }
+        let time = 0;
+        const interval = setInterval(() => {
+            const element = document.getElementById(
+                `${currentRowIndex}-${time}`,
+            );
+            if (element) {
+                element.style.animation = "cell-win 0.5s";
+            }
+            const last = time;
+            setGrid((prevGrid: any) => {
+                const newGrid = [...prevGrid];
+                return updateGrid(newGrid, "yes", {
+                    row: currentRowIndex,
+                    col: last,
+                });
+            });
+            if (time === wordLength - 1) {
+                setGrid((prevGrid: any) => {
+                    console.log("prevGrid: ", prevGrid);
+                    return prevGrid;
+                });
+                clearInterval(interval);
+            } else time++;
+        }, 200);
         return true;
     }
     const tmp = word.split("");

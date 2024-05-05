@@ -7,3 +7,4 @@ export type MyCells = {
 };
 
 export type GameState = "on" | "win" | "lose";
+export type Mode = "easy" | "normal" | "hard";
