@@ -2,6 +2,8 @@
 import Game from "@/app/Game";
 import React, { useEffect, useState } from "react";
 import { socket } from "@/client/client-io";
+import { User } from "@clerk/nextjs/server";
+import { getUser } from "@/actions/getUser";
 
 const page = ({ params }: { params: { mode: string } }) => {
     const { mode } = params;
@@ -12,29 +14,54 @@ const page = ({ params }: { params: { mode: string } }) => {
     if (mode.startsWith("1")) {
         return <Game mode={mode} />;
     }
+    const [user, setUser] = useState<User | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [transport, setTransport] = useState("N/A");
     const [message, setMessage] = useState("");
     const [myInput, setMyInput] = useState("");
+    const [word, setWord] = useState("");
     useEffect(() => {
-        socket.on("connection", () => {
+        if (!user) {
+            getUser()
+                .then((data) => JSON.parse(data))
+                .then(setUser);
+            return;
+        }
+        if (socket.connected) {
+            onConnect();
+        }
+
+        function onConnect() {
             setIsConnected(true);
             setTransport(socket.io.engine.transport.name);
-        });
-        socket.on("disconnect", () => {
+
+            socket.io.engine.on("upgrade", (transport) => {
+                setTransport(transport.name);
+            });
+        }
+
+        function onDisconnect() {
             setIsConnected(false);
+            setTransport("N/A");
+        }
+        socket.emit("join", {
+            user: user?.firstName + " " + user?.lastName,
+            mode: mode,
         });
-        socket.on("message", (data: { user: string; message: string }) => {
-            setMessage(`${data.user}: ${data.message}`);
+        socket.on("start", (data) => {
+            setWord(data.word);
         });
+        socket.on("connect", onConnect);
+        socket.on("disconnect", onDisconnect);
+
         return () => {
-            socket.off("connection");
-            socket.off("message");
-            // socket.disconnect();
+            socket.off("connect", onConnect);
+            socket.off("disconnect", onDisconnect);
         };
-    }, []);
+    }, [user]);
 
     const handleClick = (e: any) => {
+        socket.emit("join", { user: user?.fullName, room: mode });
         // socket.emit("click", `clicked ${myInput}`);
         console.log("click");
     };
