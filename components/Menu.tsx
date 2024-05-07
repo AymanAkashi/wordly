@@ -30,6 +30,8 @@ import {
     Contact,
     Gamepad2,
 } from "lucide-react";
+import { getUser } from "@/actions/getUser";
+import { User } from "@clerk/nextjs/server";
 
 const PlusIcon = (props: any) => (
     <svg
@@ -64,7 +66,17 @@ export default function Menu({
     const [darkMode, setDarkMode] = React.useState<boolean>(false);
     const [open, setOpen] = useState(false);
     const pressedKeys: { [key: string]: boolean } = {};
+    const [user, setUser] = useState<User | null>(null);
     useEffect(() => {
+        if (!user) {
+            getUser()
+                .then((data) => {
+                    return JSON.parse(data);
+                })
+                .then((data) => {
+                    setUser(data);
+                });
+        }
         window.addEventListener("keydown", (event) => {
             if (pressedKeys[event.key]) return;
             pressedKeys[event.key] = true;
@@ -88,12 +100,21 @@ export default function Menu({
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild className="cursor-pointer">
-                <Avatar src="https://avatars.githubusercontent.com/u/45667409?v=4" />
+            <DropdownMenuTrigger
+                asChild
+                className="cursor-pointer select-none border border-amber-400 hover:border-2 transition-all delay-75 duration-100 border-collapse"
+            >
+                <Avatar
+                    src={
+                        user == null
+                            ? `https://avatars.githubusercontent.com/u/45667409?v=4`
+                            : user.imageUrl
+                    }
+                />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="text-xl color-change">
-                    Akashi6
+                    {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
