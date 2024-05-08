@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { socket } from "@/client/client-io";
 import { User } from "@clerk/nextjs/server";
 import { getUser } from "@/actions/getUser";
+import { generate } from "random-words";
+import GameMode from "./GameMode";
 
 const page = ({ params }: { params: { mode: string } }) => {
     const { mode } = params;
@@ -20,6 +22,7 @@ const page = ({ params }: { params: { mode: string } }) => {
     const [message, setMessage] = useState("");
     const [myInput, setMyInput] = useState("");
     const [word, setWord] = useState("");
+    const [waiting, setWaiting] = useState<string[]>([]);
     useEffect(() => {
         if (!user) {
             getUser()
@@ -45,14 +48,33 @@ const page = ({ params }: { params: { mode: string } }) => {
             setTransport("N/A");
         }
         socket.emit("join", {
+            word: word,
             user: user?.firstName + " " + user?.lastName,
             mode: mode,
         });
         socket.on("start", (data) => {
+            console.log("data was recv: ", data);
             setWord(data.word);
         });
         socket.on("connect", onConnect);
         socket.on("disconnect", onDisconnect);
+
+        setTimeout(() => {
+            let word = generate().toString();
+            fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setWaiting((prev: string[]) => {
+                        const newData = [...prev];
+                        newData.push(data[0].word);
+                        newData.push(
+                            data[0].meanings[0].definitions[0].definition,
+                        );
+                        return newData;
+                    });
+                }),
+                1000;
+        });
 
         return () => {
             socket.off("connect", onConnect);
@@ -67,28 +89,23 @@ const page = ({ params }: { params: { mode: string } }) => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-start">
-            Hello World! {isConnected ? "connected" : "disconnected"}{" "}
-            {transport}
-            <div>{message}</div>
-            <label htmlFor="myinput">write message</label>
-            <input
-                id="myinput"
-                type="text"
-                value={myInput}
-                onChange={(e) => setMyInput(e.target.value)}
-                className="text-black bg-white border-2 border-black rounded-2xl px-2 py-1 w-40"
-            />
-            <button
-                type="button"
-                title="click me"
-                onClick={handleClick}
-                className="px-2 bg-yellow-300 rounded-2xl hover:scale-110"
-            >
-                {" "}
-                Click me
-            </button>
-        </div>
+        <>
+            {word ? (
+                <GameMode mode={mode} newWord={word} socket={socket} />
+            ) : (
+                <div className="flex flex-col justify-center items-center space-y-4 w-full">
+                    <div className="font-mono">waiting other players...</div>
+                    {waiting.length > 1 && (
+                        <div className="flex flex-col justify-center items-center animate-fading-up w-1/2">
+                            <div className="text-4xl">{waiting[0]}</div>
+                            <div className="text-3xl font-serif">
+                                {waiting[1]}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </>
     );
 };
 

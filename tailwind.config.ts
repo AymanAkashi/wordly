@@ -58,6 +58,20 @@ const config = {
                     },
                     "50%": { transform: "translateX(0)" },
                 },
+                "dash-rotate": {
+                    "0%, 100%": {
+                        backgroundSize: "100% 100%",
+                        backgroundPosition: "0% 0%",
+                    },
+                    "50%": {
+                        backgroundSize: "200% 200%",
+                        backgroundPosition: "100% 100%",
+                    },
+                },
+                "fading-up": {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                },
             },
             animation: {
                 "color-change": "color-change 2s infinite",
@@ -65,6 +79,7 @@ const config = {
                 "accordion-up": "accordion-up 0.2s ease-out",
                 "image-fade": "image-fade 1s ease-in-out",
                 "cell-win": "cell-win 2s ease-in-out",
+                "fading-up": "fading-up 1s ease-out",
             },
         },
     },

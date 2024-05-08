@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Cells from "@/components/cells";
 import { ErrorDialog } from "@/components/error-dialog";
 import { generateWord } from "@/actions/generateWord";
@@ -31,7 +31,15 @@ const Hearts = ({ heart }: { heart: number }) => {
     );
 };
 
-const Game = ({ mode }: { mode: string }) => {
+const GameMode = ({
+    mode,
+    newWord,
+    socket,
+}: {
+    mode: string;
+    newWord: string;
+    socket: any;
+}) => {
     const {
         word,
         setWord,
@@ -54,8 +62,20 @@ const Game = ({ mode }: { mode: string }) => {
         setTimer,
         timer,
     } = useContext(GameContext);
+    const [count, setCount] = useState(5);
+    if (word != newWord) setWord(newWord);
+    useEffect(() => {
+        if (count === 0)
+            setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
+        const interval = setInterval(() => {
+            setCount(count - 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [count]);
 
     useEffect(() => {
+        if (timer === -1 && count === 0)
+            setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
         if (timer === -1 || game !== "on") return;
         if (timer === 0 || heart === 0) {
             setGame("lose");
@@ -64,11 +84,15 @@ const Game = ({ mode }: { mode: string }) => {
         }
         const interval = setInterval(() => {
             setTimer(timer - 1);
+            setCount(count - 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [timer]);
 
     useEffect(() => {
+        if (game === "lose" || game === "win") {
+            socket.emit("end", { game: game });
+        }
         if (word == "") {
             generateWord(wordLength).then((data) => {
                 setWord(data);
@@ -84,8 +108,6 @@ const Game = ({ mode }: { mode: string }) => {
                 guess.length < wordLength &&
                 currentCharIndex < wordLength
             ) {
-                if (timer === -1)
-                    setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
                 const key = document.getElementById("kbd-" + e.key);
                 if (key) {
                     key.classList.add("bg-sky-500");
@@ -166,6 +188,15 @@ const Game = ({ mode }: { mode: string }) => {
                         </div>
                     )),
                 )}
+                {count >= 0 && (
+                    <div className="countdown absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl text-white bg-black/50 px-4 py-2 rounded-xl">
+                        <span
+                            style={{
+                                "--value": count,
+                            }}
+                        ></span>
+                    </div>
+                )}
                 {notif && (
                     <div className="absolute inset-0 m-auto z-10 flex justify-center items-center">
                         <ErrorDialog message={notif} setError={setNotif} />
@@ -206,4 +237,4 @@ const Game = ({ mode }: { mode: string }) => {
     );
 };
 
-export default Game;
+export default GameMode;

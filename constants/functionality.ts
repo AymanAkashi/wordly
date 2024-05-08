@@ -1,6 +1,6 @@
 import { Cell, MyCells } from "@/lib/types";
 import { rows, wordLength } from "@/constants/constent";
-import { generateWord } from "./generateWord";
+import { generateWord } from "../actions/generateWord";
 import Cells from "@/components/cells";
 import { validWord } from "./valid-word";
 import { setupGrid } from "./setup-game";
@@ -28,25 +28,27 @@ export const resetGame = ({
 }) => {
     setGrid(
         Array.from({ length: rows }, () =>
-            Array(wordLength).fill({ key: "", value: "no" })
-        )
+            Array(wordLength).fill({ key: "", value: "no" }),
+        ),
     );
 
     for (let i = 0; i < 26; i++) {
         const key = document.getElementById(
-            `kbd-${String.fromCharCode(97 + i)}`
+            `kbd-${String.fromCharCode(97 + i)}`,
         );
         if (key) {
-            key.classList.remove("bg-yellow-500");
+            // find all keys and remove background color
+            key.classList.remove("bg-sky-500");
             key.classList.remove("bg-red-500");
             key.classList.remove("bg-green-500");
+            key.classList.remove("bg-yellow-500");
         }
     }
     setTimer(-1);
     setHeart(3);
     setGuess("");
     setGame("on");
-    setWord(generateWord(wordLength));
+    generateWord(wordLength).then((data) => setWord(data));
     setCurrentCharIndex(0);
     setCurrentRowIndex(0);
     setNotif("");
@@ -112,13 +114,13 @@ export const DeleteLetter = ({
             return newGrid;
         });
         setCurrentCharIndex((prevCharIndex: number) =>
-            prevCharIndex - 1 > 0 ? prevCharIndex - 1 : 0
+            prevCharIndex - 1 > 0 ? prevCharIndex - 1 : 0,
         );
     }
     const cell = document.getElementById(
         `${currentRowIndex}-${
             currentCharIndex - 1 > 0 ? currentCharIndex - 1 : 0
-        }`
+        }`,
     );
     if (cell) {
         // remove animation
@@ -152,7 +154,7 @@ export const AddLetter = ({
     setGuess((prevGuess: string) => prevGuess + newChar);
     setCurrentCharIndex((prevCharIndex: number) => prevCharIndex + 1);
     const cell = document.getElementById(
-        `${currentRowIndex}-${currentCharIndex}`
+        `${currentRowIndex}-${currentCharIndex}`,
     );
     if (cell) {
         cell.style.animation = "shake 0.5s";
