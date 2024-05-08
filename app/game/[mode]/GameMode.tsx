@@ -191,9 +191,11 @@ const GameMode = ({
                 {count >= 0 && (
                     <div className="countdown absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl text-white bg-black/50 px-4 py-2 rounded-xl">
                         <span
-                            style={{
-                                "--value": count,
-                            }}
+                            style={
+                                {
+                                    "--value": count,
+                                } as React.CSSProperties
+                            }
                         ></span>
                     </div>
                 )}
