@@ -5,7 +5,7 @@ import React, { useContext } from "react";
 import { GameContext } from "@/context/ContextProvider";
 import Link from "next/link";
 
-const GameOver = () => {
+const GameOver = ({ winner }: { winner?: string }) => {
     const {
         word,
         game,
@@ -40,6 +40,11 @@ const GameOver = () => {
                     <IoClose className="w-6 h-6 rounded-full border " />
                 </button>
                 <div className="dark:bg-gray-300 bg-neutral-700 flex flex-col justify-center items-center space-y-3 rounded-b-2xl py-4">
+                    {winner && (
+                        <div className="text-center text-2xl px-4 text-black">
+                            {winner} won the game
+                        </div>
+                    )}
                     {game === "lose" && (
                         <>
                             <div className="text-center text-xl text-black">

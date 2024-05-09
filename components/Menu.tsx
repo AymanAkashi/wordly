@@ -114,7 +114,11 @@ export default function Menu({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="text-xl color-change">
-                    {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
+                    {!user
+                        ? "Loading..."
+                        : user && user.firstName != null
+                          ? `${user.firstName} ${user.lastName}`
+                          : user.username}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
