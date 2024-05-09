@@ -11,11 +11,16 @@ const handler = app.getRequestHandler();
 
 const queue = new Map([
     ["2x1", []],
+    ["3x1", []],
+    ["4x1", []],
     ["2x2", []],
     ["3x2", []],
     ["4x2", []],
+    ["2x3", []],
+    ["3x3", []],
+    ["4x3", []],
 ]);
-const clients = [];
+let clients = [];
 
 let word;
 
@@ -25,6 +30,8 @@ class Game {
         this.word = word;
     }
 }
+// Array of games that have each player in the game
+let games = [];
 
 const getWord = async () => {
     const response = await fetch("http://localhost:3000/api/get-word");
@@ -73,13 +80,42 @@ app.prepare().then(() => {
                     console.log("player: ", player.user);
                     playerSocket.emit("start", { word });
                 });
+                // push the players to the games array once the game started
+                games.push(players);
                 queue.set(data.mode, []);
             }
+        });
+        socket.on("end", (data) => {
+            // find the winner:
+            console.log("data: ", data);
+            console.log("games: ", games);
+            let winner;
+            games.forEach(
+                (game) =>
+                    (winner = game.filter((player) => player.id === data.id)),
+            );
+            console.log("winner: ", winner);
+            // send the end game to the other players
+            games.forEach((game) => {
+                game.forEach((player) => {
+                    if (player.id !== data.id) {
+                        const playerSocket = clients.find(
+                            (client) => client.id === player.id,
+                        );
+                        playerSocket.emit("end", { user: winner[0].user });
+                    }
+                });
+            });
+
+            // remove the game from the games array
+            games = games.filter((game) => {
+                game.find((player) => player.id !== data.id);
+            });
         });
         socket.on("disconnect", () => {
             console.log("disconnected: ", socket.id);
             // remove the user from the clients array
-            clients.splice(clients.indexOf(socket), 1);
+            clients = clients.filter((client) => client.id !== socket.id);
             console.log("clients: ", clients.length);
         });
     });

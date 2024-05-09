@@ -63,6 +63,7 @@ const GameMode = ({
         timer,
     } = useContext(GameContext);
     const [count, setCount] = useState(5);
+    const [winner, setWinner] = useState("");
     if (word != newWord) setWord(newWord);
     useEffect(() => {
         if (count === 0)
@@ -90,8 +91,16 @@ const GameMode = ({
     }, [timer]);
 
     useEffect(() => {
-        if (game === "lose" || game === "win") {
-            socket.emit("end", { game: game });
+        socket.on("end", (data: any) => {
+            setGame("lose");
+            console.log("data was recv: ", data);
+            setWinner(data.user);
+            setModal(true);
+        });
+        if (game === "win") {
+            socket.emit("end", { game: game, id: socket.id });
+            setWinner("You");
+            setModal(true);
         }
         if (word == "") {
             generateWord(wordLength).then((data) => {
@@ -204,7 +213,7 @@ const GameMode = ({
                         <ErrorDialog message={notif} setError={setNotif} />
                     </div>
                 )}
-                {modal && <GameOver />}
+                {modal && <GameOver winner={winner} />}
             </div>
             <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
                 <span>

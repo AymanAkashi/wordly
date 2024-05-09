@@ -49,7 +49,7 @@ const page = ({ params }: { params: { mode: string } }) => {
         }
         socket.emit("join", {
             word: word,
-            user: user?.firstName + " " + user?.lastName,
+            user: user.username || user.fullName || user.firstName,
             mode: mode,
         });
         socket.on("start", (data) => {
