@@ -62,12 +62,24 @@ app.prepare().then(() => {
         socket.on("join", (data) => {
             // check if the user already in the queue
             if (
-                queue.get(data.mode).some((player) => player.id === socket.id)
+                queue
+                    .get(data.mode)
+                    .some(
+                        (player) =>
+                            player.id === socket.id ||
+                            player.user === data.user,
+                    )
             ) {
                 return;
             }
-            queue.get(data.mode).push({ id: socket.id, user: data.user });
+            queue
+                .get(data.mode)
+                .push({ id: socket.id, user: data.user, avatar: data.avatar });
             console.log("word: ", word);
+            const players = queue.get(data.mode);
+            socket.emit("join", {
+                ...queue.get(data.mode),
+            });
             if (queue.get(data.mode).length === +data.mode.split("x")[0]) {
                 const players = queue.get(data.mode);
                 console.log("players: ", players);

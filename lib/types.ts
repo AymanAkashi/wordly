@@ -8,3 +8,8 @@ export type MyCells = {
 
 export type GameState = "on" | "win" | "lose";
 export type Mode = "easy" | "normal" | "hard";
+
+export type userType = {
+    user: string;
+    avatar: string;
+};

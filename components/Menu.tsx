@@ -102,7 +102,7 @@ export default function Menu({
         <DropdownMenu>
             <DropdownMenuTrigger
                 asChild
-                className="cursor-pointer select-none border border-amber-400 hover:border-2 transition-all delay-75 duration-100 border-collapse"
+                className="cursor-pointer select-none  transition-all delay-75 duration-100 outline-dotted outline-2 outline-amber-400 hover:outline-amber-600"
             >
                 <Avatar
                     src={
