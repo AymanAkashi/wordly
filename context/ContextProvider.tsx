@@ -1,13 +1,14 @@
 "use client";
+import { socket } from "@/client/client-io";
 import { rows, wordLength } from "@/constants/constent";
 import { GameState, MyCells } from "@/lib/types";
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 export const GameContext = createContext({
     word: "",
     setWord: (word: string) => {},
     grid: Array.from({ length: rows }, () =>
-        Array(wordLength).fill({ key: "", value: "no" })
+        Array(wordLength).fill({ key: "", value: "no" }),
     ),
     setGrid: (grid: MyCells[][]) => {},
     currentRowIndex: 0,
@@ -26,15 +27,34 @@ export const GameContext = createContext({
     setTimer: (timer: number) => {},
     heart: 3,
     setHeart: (heart: number) => {},
+    socket,
 });
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
+    useEffect(() => {
+        function onConnect() {
+            console.log("connected");
+        }
+        function onDisconnect() {
+            console.log("disconnected");
+        }
+        if (socket.connected) {
+            onConnect();
+        }
+
+        socket.on("connect", onConnect);
+        socket.on("disconnect", onDisconnect);
+        return () => {
+            socket.off("connect", onConnect);
+            socket.off("disconnect", onDisconnect);
+        };
+    }, []);
     const [word, setWord] = useState<string>("");
 
     const [grid, setGrid] = useState<MyCells[][]>(
         Array.from({ length: rows }, () =>
-            Array(wordLength).fill({ key: "", value: "no" })
-        )
+            Array(wordLength).fill({ key: "", value: "no" }),
+        ),
     );
     const [currentRowIndex, setCurrentRowIndex] = useState(0);
     const [currentCharIndex, setCurrentCharIndex] = useState(0);
@@ -67,6 +87,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
                 setHeart,
                 timer,
                 setTimer,
+                socket,
             }}
         >
             {children}

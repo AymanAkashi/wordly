@@ -10,6 +10,7 @@ export type GameState = "on" | "win" | "lose";
 export type Mode = "easy" | "normal" | "hard";
 
 export type userType = {
+    id: string;
     user: string;
     avatar: string;
 };

@@ -35,10 +35,14 @@ const GameMode = ({
     mode,
     newWord,
     socket,
+    room,
+    name,
 }: {
     mode: string;
     newWord: string;
     socket: any;
+    room: string;
+    name: string | null;
 }) => {
     const {
         word,
@@ -98,7 +102,7 @@ const GameMode = ({
             setModal(true);
         });
         if (game === "win") {
-            socket.emit("end", { game: game, id: socket.id });
+            socket.emit("end", { name, id: socket.id, room: room });
             setWinner("You");
             setModal(true);
         }

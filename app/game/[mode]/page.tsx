@@ -1,14 +1,15 @@
 "use client";
 import Game from "@/app/Game";
-import React, { useEffect, useState } from "react";
-import { socket } from "@/client/client-io";
+import React, { useContext, useEffect, useState } from "react";
 import { User } from "@clerk/nextjs/server";
 import { getUser } from "@/actions/getUser";
 import { generate } from "random-words";
 import GameMode from "./GameMode";
 import { userType } from "@/lib/types";
+import { GameContext } from "@/context/ContextProvider";
 
 const page = ({ params }: { params: { mode: string } }) => {
+    const { socket } = useContext(GameContext);
     const { mode } = params;
 
     if (mode.length > 3 || !RegExp(/[1-4]x[1-4]/).test(mode)) {
@@ -24,6 +25,7 @@ const page = ({ params }: { params: { mode: string } }) => {
     const [myInput, setMyInput] = useState("");
     const [word, setWord] = useState("");
     const [users, setUsers] = useState<userType[]>([]);
+    const [room, setRoom] = useState<string>("");
     const [waiting, setWaiting] = useState<string[]>([]);
     useEffect(() => {
         if (!user) {
@@ -32,41 +34,19 @@ const page = ({ params }: { params: { mode: string } }) => {
                 .then(setUser);
             return;
         }
-        if (socket.connected) {
-            onConnect();
-        }
-
-        function onConnect() {
-            setIsConnected(true);
-            setTransport(socket.io.engine.transport.name);
-
-            socket.io.engine.on("upgrade", (transport) => {
-                setTransport(transport.name);
-            });
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            setTransport("N/A");
-        }
         socket.emit("join", {
             word: word,
-            user: user.username || user.fullName || user.firstName,
+            name: user.username || user.fullName || user.firstName,
             mode: mode,
             avatar: user.imageUrl,
         });
-        socket.on("join", (data) => {
+        socket.on("joined", (data) => {
             console.log("data was recv: ", data);
-            setUsers((prev: userType[]) => {
-                const newData = [...prev];
-                newData.push(data);
-                return newData;
-            });
-        });
-        socket.on("start", (data) => {
-            console.log("data was recv: ", data);
+            const {players, room, word} = data;
+            setUsers(players);
+            setRoom(room);
             setTimeout(() => {
-                setWord(data.word);
+                setWord(word);
             }, 5000);
         });
 
@@ -85,17 +65,10 @@ const page = ({ params }: { params: { mode: string } }) => {
                     });
                 }),
                 1000;
-            socket.on("connect", onConnect);
-            socket.on("disconnect", onDisconnect);
-            return () => {
-                socket.off("connect", onConnect);
-                socket.off("disconnect", onDisconnect);
-            };
         });
-
         return () => {
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
+            socket.off("join");
+            socket.off("start");
         };
     }, [user]);
 
@@ -108,7 +81,7 @@ const page = ({ params }: { params: { mode: string } }) => {
     return (
         <>
             {word ? (
-                <GameMode mode={mode} newWord={word} socket={socket} />
+                <GameMode mode={mode} newWord={word} socket={socket} room={room} name={user?.username || user?.fullName || user?.firstName || ""} />
             ) : (
                 <div className="flex flex-col justify-center items-center space-y-4 w-full">
                     <div className="text-4xl">Game Mode: {mode}</div>
