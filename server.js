@@ -21,6 +21,7 @@ const {
     CheckQueue,
     JoinRoom,
     getRoom,
+    AddLoser,
 } = require("./game");
 
 app.prepare().then(() => {
@@ -38,6 +39,7 @@ app.prepare().then(() => {
             word = data;
         });
         socket.on("join", (data) => {
+            console.log("join: ", data);
             AddPlayer({
                 id: socket.id,
                 name: data.name,
@@ -60,21 +62,27 @@ app.prepare().then(() => {
                 });
             }
         });
-        socket.on("leave", () => {
-            RemovePlayer(socket.id);
-            removePlayerFromQueue(socket.id);
-            socket.emit("players", getPlayers());
+        socket.on("lose", (data) => {
+            if (AddLoser(data.room, data.mode, socket.id)) {
+                const room = getRoom(data.room);
+                room.forEach((player) => {
+                    const playerSocket = io.sockets.sockets.get(player.id);
+                    playerSocket.emit("lose", data);
+                });
+            }
         });
         socket.on("end", (data) => {
             const room = getRoom(data.room);
             room.forEach((player) => {
-                const playerSocket = io.sockets.sockets.get(player.id);
-                playerSocket.leave(data.room);
-                playerSocket.emit("end", data);
+                if (player.id !== data.id) {
+                    const playerSocket = io.sockets.sockets.get(player.id);
+                    playerSocket.emit("end", data);
+                }
             });
         });
         socket.on("disconnect", () => {
             console.log("disconnected: ", socket.id);
+            RemovePlayer(socket.id);
         });
     });
 

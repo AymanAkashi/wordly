@@ -16,6 +16,7 @@ import GameOver from "@/components/game-over";
 import { GameContext } from "@/context/ContextProvider";
 import { setupGrid } from "@/constants/setup-game";
 import Keyboard from "@/components/keyboard";
+import Link from "next/link";
 
 const Hearts = ({ heart }: { heart: number }) => {
     return (
@@ -68,6 +69,7 @@ const GameMode = ({
     } = useContext(GameContext);
     const [count, setCount] = useState(5);
     const [winner, setWinner] = useState("");
+    const [Waiting, setWaiting] = useState(false);
     if (word != newWord) setWord(newWord);
     useEffect(() => {
         if (count === 0)
@@ -82,9 +84,11 @@ const GameMode = ({
         if (timer === -1 && count === 0)
             setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
         if (timer === -1 || game !== "on") return;
-        if (timer === 0 || heart === 0) {
+        if (timer === 0 || heart === 0 || currentRowIndex === rows) {
+            console.log("lose\n");
+            socket.emit("lose", { name, id: socket.id, room: room, mode });
+            setWaiting(true);
             setGame("lose");
-            setModal(true);
             return;
         }
         const interval = setInterval(() => {
@@ -95,11 +99,24 @@ const GameMode = ({
     }, [timer]);
 
     useEffect(() => {
+        if (currentRowIndex === rows) {
+            console.log("lose\n");
+            socket.emit("lose", { name, id: socket.id, room: room, mode });
+            setWaiting(true);
+            setGame("lose");
+            return;
+        }
         socket.on("end", (data: any) => {
             setGame("lose");
             console.log("data was recv: ", data);
-            setWinner(data.user);
+            setWinner(data.name);
             setModal(true);
+        });
+        socket.on("lose", (data: any) => {
+            setGame("lose");
+            setWaiting(false);
+            setModal(true);
+            setWinner("No one");
         });
         if (game === "win") {
             socket.emit("end", { name, id: socket.id, room: room });
@@ -178,11 +195,12 @@ const GameMode = ({
                 });
             }
         }
+        console.log("Waiting: ", Waiting);
         document.addEventListener("keydown", handleKeyDown);
         return function cleanup() {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [currentCharIndex, grid]);
+    }, [currentCharIndex, grid, Waiting]);
 
     return (
         <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8 rel relative">
@@ -217,7 +235,21 @@ const GameMode = ({
                         <ErrorDialog message={notif} setError={setNotif} />
                     </div>
                 )}
-                {modal && <GameOver winner={winner} />}
+                {modal && !Waiting && (
+                    <div className="absolute inset-0 m-auto z-10 flex justify-center items-center w-full px-2">
+                        <div className="flex justify-center flex-col items-center bg-gradient-to-tr to-black/50 rounded-2xl p-2">
+                            <p className="text-4xl  px-2 py-1">
+                                Waiting Other Players to finished !
+                            </p>
+                            <Link href="/home">
+                                <button className="bg-red-500 text-white px-2 py-1 rounded-xl ml-2 hover:scale-95 hover:bg-red-700 transition-all delay-75 duration-100">
+                                    Go Back
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                )}
+                {!modal && <GameOver winner={winner} />}
             </div>
             <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
                 <span>

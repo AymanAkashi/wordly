@@ -10,13 +10,41 @@ const queue = new Map([
     ["4x3", []],
 ]);
 
+const Losers = new Map([[]]);
+
 const rooms = new Map([[]]);
 
 const AddPlayer = (player) => {
-    console.log("Player added: ", player);
     queue.get(player.mode).find((p) => p.id === player.id)
         ? null
         : queue.get(player.mode).push(player);
+};
+
+const CreateLosers = (room) => {
+    Losers.set(room, []);
+};
+
+const AddLoser = (room, mode, socketId) => {
+    if (!Losers.has(room)) {
+        CreateLosers(room);
+    }
+    const roomLosers = Losers.get(room);
+    console.log(
+        "Add loser: ",
+        roomLosers,
+        " mode: ",
+        parseInt(mode.split("x")[0]),
+    );
+    if (roomLosers && roomLosers.find((p) => p == socketId)) {
+        return false;
+    }
+    roomLosers.push(socketId);
+    console.log("Add loser: ", roomLosers);
+    if (roomLosers && roomLosers.length === parseInt(mode.split("x")[0])) {
+        console.log("finished game!");
+        return true;
+    }
+    return false;
 };
 
 const JoinRoom = (player, room) => {
@@ -59,7 +87,7 @@ const getQueue = (mode) => {
 };
 
 const getMode = (mode) => {
-    const modePlayers = modes.find((r) => r[mode]);
+    const modePlayers = queue.find((r) => r[mode]);
     return modePlayers ? modePlayers[mode] : [];
 };
 
@@ -101,4 +129,5 @@ module.exports = {
     getPlayers,
     JoinRoom,
     getRoom,
+    AddLoser,
 };

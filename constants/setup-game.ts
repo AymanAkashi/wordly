@@ -133,7 +133,7 @@ export const setupGrid = ({
 
     if (currentRowIndex === rows - 1) {
         setGame("lose");
-        setModal(true);
+        // setModal(true);
     }
     return false;
 };

@@ -69,7 +69,7 @@ export const moveNextCell = ({
 }) => {
     if (currentRowIndex === rows - 1) {
         setGame("lose");
-        setModal(true);
+        // setModal(true);
         setCurrentRowIndex(rows);
         return;
     } else {
