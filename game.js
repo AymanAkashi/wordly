@@ -24,23 +24,18 @@ const CreateLosers = (room) => {
     Losers.set(room, []);
 };
 
-const AddLoser = (room, mode, socketId) => {
+const AddLoser = (room, sizeRoom, socketId) => {
     if (!Losers.has(room)) {
         CreateLosers(room);
     }
     const roomLosers = Losers.get(room);
-    console.log(
-        "Add loser: ",
-        roomLosers,
-        " mode: ",
-        parseInt(mode.split("x")[0]),
-    );
+    console.log("Add loser: ", roomLosers, " mode: ", sizeRoom);
     if (roomLosers && roomLosers.find((p) => p == socketId)) {
         return false;
     }
     roomLosers.push(socketId);
     console.log("Add loser: ", roomLosers);
-    if (roomLosers && roomLosers.length === parseInt(mode.split("x")[0])) {
+    if (roomLosers && roomLosers.length === sizeRoom) {
         console.log("finished game!");
         return true;
     }

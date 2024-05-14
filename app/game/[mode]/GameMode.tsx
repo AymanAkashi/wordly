@@ -12,7 +12,7 @@ import {
     handleWord,
 } from "@/constants/functionality";
 import { validWord } from "@/constants/valid-word";
-import GameOver from "@/components/game-over";
+import RestartGame from "@/components/rematch-game";
 import { GameContext } from "@/context/ContextProvider";
 import { setupGrid } from "@/constants/setup-game";
 import Keyboard from "@/components/keyboard";
@@ -38,12 +38,14 @@ const GameMode = ({
     socket,
     room,
     name,
+    avatar,
 }: {
     mode: string;
     newWord: string;
     socket: any;
     room: string;
     name: string | null;
+    avatar: string;
 }) => {
     const {
         word,
@@ -99,7 +101,7 @@ const GameMode = ({
     }, [timer]);
 
     useEffect(() => {
-        if (currentRowIndex === rows) {
+        if (currentRowIndex === rows || heart <= 0) {
             console.log("lose\n");
             socket.emit("lose", { name, id: socket.id, room: room, mode });
             setWaiting(true);
@@ -235,7 +237,7 @@ const GameMode = ({
                         <ErrorDialog message={notif} setError={setNotif} />
                     </div>
                 )}
-                {modal && !Waiting && (
+                {!modal && Waiting && (
                     <div className="absolute inset-0 m-auto z-10 flex justify-center items-center w-full px-2">
                         <div className="flex justify-center flex-col items-center bg-gradient-to-tr to-black/50 rounded-2xl p-2">
                             <p className="text-4xl  px-2 py-1">
@@ -249,7 +251,15 @@ const GameMode = ({
                         </div>
                     </div>
                 )}
-                {!modal && <GameOver winner={winner} />}
+                {modal && (
+                    <RestartGame
+                        winner={winner}
+                        room={room}
+                        name={name || ""}
+                        mode={mode}
+                        avatar={avatar}
+                    />
+                )}
             </div>
             <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
                 <span>

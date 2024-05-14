@@ -62,13 +62,35 @@ app.prepare().then(() => {
                 });
             }
         });
-        socket.on("lose", (data) => {
-            if (AddLoser(data.room, data.mode, socket.id)) {
-                const room = getRoom(data.room);
-                room.forEach((player) => {
+        socket.on("leave-room", (data) => {
+            const room = getRoom(data.room);
+            // remove player from room
+            if (room) {
+                const index = room.findIndex(
+                    (player) => player.id === socket.id,
+                );
+                if (index !== -1) {
+                    room.splice(index, 1);
+                }
+                if (room.length === 1) {
+                    const player = room[0];
                     const playerSocket = io.sockets.sockets.get(player.id);
-                    playerSocket.emit("lose", data);
-                });
+                    playerSocket.emit("end", {
+                        id: player.id,
+                        room: data.room,
+                    });
+                }
+            }
+        });
+        socket.on("lose", (data) => {
+            const room = getRoom(data.room);
+            if (room) {
+                if (AddLoser(data.room, room.length, socket.id)) {
+                    room.forEach((player) => {
+                        const playerSocket = io.sockets.sockets.get(player.id);
+                        playerSocket.emit("lose", data);
+                    });
+                }
             }
         });
         socket.on("end", (data) => {

@@ -7,6 +7,7 @@ import { generate } from "random-words";
 import GameMode from "./GameMode";
 import { userType } from "@/lib/types";
 import { GameContext } from "@/context/ContextProvider";
+import { useRouter } from "next/navigation";
 
 const page = ({ params }: { params: { mode: string } }) => {
     const { socket } = useContext(GameContext);
@@ -18,6 +19,7 @@ const page = ({ params }: { params: { mode: string } }) => {
     if (mode.startsWith("1")) {
         return <Game mode={mode} />;
     }
+    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [transport, setTransport] = useState("N/A");
@@ -28,6 +30,14 @@ const page = ({ params }: { params: { mode: string } }) => {
     const [room, setRoom] = useState<string>("");
     const [waiting, setWaiting] = useState<string[]>([]);
     useEffect(() => {
+        const leavingGame = () => {
+            if (confirm("Are you sure you want to leave the game?")) {
+                socket.emit("leave-room", { room });
+                router.push("/home");
+            }
+        };
+        console.log("leaving game");
+        window.addEventListener("beforeunload", leavingGame);
         if (!user) {
             getUser()
                 .then((data) => JSON.parse(data))
@@ -35,14 +45,13 @@ const page = ({ params }: { params: { mode: string } }) => {
             return;
         }
         socket.emit("join", {
-            word: word,
             name: user.username || user.fullName || user.firstName,
             mode: mode,
             avatar: user.imageUrl,
         });
         socket.on("joined", (data) => {
             console.log("data was recv: ", data);
-            const {players, room, word} = data;
+            const { players, room, word } = data;
             setUsers(players);
             setRoom(room);
             setTimeout(() => {
@@ -66,22 +75,32 @@ const page = ({ params }: { params: { mode: string } }) => {
                 }),
                 1000;
         });
+
         return () => {
+            window.removeEventListener("beforeunload", leavingGame);
             socket.off("join");
             socket.off("start");
+            socket.off("leave-room");
+            socket.off("joined");
         };
     }, [user]);
-
-    const handleClick = (e: any) => {
-        socket.emit("join", { user: user?.fullName, room: mode });
-        // socket.emit("click", `clicked ${myInput}`);
-        console.log("click");
-    };
 
     return (
         <>
             {word ? (
-                <GameMode mode={mode} newWord={word} socket={socket} room={room} name={user?.username || user?.fullName || user?.firstName || ""} />
+                <GameMode
+                    mode={mode}
+                    newWord={word}
+                    socket={socket}
+                    room={room}
+                    name={
+                        user?.username ||
+                        user?.fullName ||
+                        user?.firstName ||
+                        ""
+                    }
+                    avatar={user?.imageUrl || ""}
+                />
             ) : (
                 <div className="flex flex-col justify-center items-center space-y-4 w-full">
                     <div className="text-4xl">Game Mode: {mode}</div>
