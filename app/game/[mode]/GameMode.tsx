@@ -205,7 +205,7 @@ const GameMode = ({
     }, [currentCharIndex, grid, Waiting]);
 
     return (
-        <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8 rel relative">
+        <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8 rel relative border-2 border-yellow-500">
             <div className="grid grid-cols-5 gap-1 relative">
                 {grid.map((row, rowIndex) =>
                     row.map((char, charIndex) => (
@@ -261,7 +261,7 @@ const GameMode = ({
                     />
                 )}
             </div>
-            <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
+            <div className="absolute top-1 left-1 lg:left-10 lg:top-20 text-xl flex flex-col justify-center items-start space-y-8">
                 <span>
                     Time left:{" "}
                     <span

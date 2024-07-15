@@ -5,6 +5,7 @@ import { ErrorDialog } from "@/components/error-dialog";
 import { generateWord } from "@/actions/generateWord";
 import { rows, wordLength } from "@/constants/constent";
 import { FaHeart } from "react-icons/fa6";
+import { IoMdTimer } from "react-icons/io";
 import {
     moveNextCell,
     DeleteLetter,
@@ -19,8 +20,10 @@ import Keyboard from "@/components/keyboard";
 
 const Hearts = ({ heart }: { heart: number }) => {
     return (
-        <div className="flex justify-center items-center space-x-12">
-            Heart:{" "}
+        <div className="flex items-start justify-center  mx-1 sm:items-center sm:space-x-12">
+            <span className="sm:block hidden">
+                Heart:{" "}
+                </span>
             <span className="relative flex justify-center items-center  px-2 py-1 w-8 h-8">
                 <FaHeart className="absolute left-0 flex justify-center items-center text-red-500 w-full h-full" />
                 <div className=" absolute z-20 flex justify-center items-center text-xl">
@@ -173,9 +176,15 @@ const Game = ({ mode }: { mode: string }) => {
                 )}
                 {modal && <GameOver />}
             </div>
-            <div className="absolute left-10 top-20 text-xl flex flex-col justify-center items-start space-y-8">
+            <div className="absolute left-1 top-1 lg:left-10 lg:top-20 text-xl flex flex-col justify-center items-start space-y-8">
                 <span>
-                    Time left:{" "}
+                    <span className="sm:inline-block hidden">
+                        
+                        Time left:{" "}
+                        </span>
+                        <span>
+                        <IoMdTimer className="inline-block sm:hidden" />{" "}
+                        </span>
                     <span
                         className={` ${
                             timer === -1 &&

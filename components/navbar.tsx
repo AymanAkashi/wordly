@@ -25,14 +25,14 @@ export const NavBar = async () => {
         false,
     ]);
     return (
-        <nav className=" w-full sm:w-3/5 h-auto flex justify-between items-center bg-transparent rounded-2xl mt-1 px-1">
+        <nav className=" w-full sm:w-3/5 h-auto flex justify-between items-center bg-transparent rounded-2xl mt-1 px-4 py-2">
             <Link href={"/home"}>
                 <Image
                     src="/logo.png"
                     alt="logo"
                     width={50}
                     height={50}
-                    className="w-12 h-12 flex items-center justify-center rounded-full"
+                    className="sm:w-12 sm:h-12 h-10 w-10  flex items-center justify-center rounded-full"
                 />
             </Link>
             <DialogUi

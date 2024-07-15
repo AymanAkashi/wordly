@@ -24,7 +24,7 @@ const Cells = ({
                 key={`${props.rowIndex}-${props.charIndex}`}
                 id={`${props.rowIndex}-${props.charIndex}`}
                 className={cn(
-                    `square size-12 text-3xl sm:size-16 sm:text-4xl lg:size-20 lg:text-5xl  text-center flex justify-center items-center animate-cell-win ${
+                    `square size-10 text-xl sm:size-12 sm:text-xl lg:size-16 lg:text-3xl  text-center flex justify-center items-center animate-cell-win ${
                         props.rowIndex !== props.currentRowIndex && "opacity-60"
                     } ${
                         props.rowIndex === props.currentRowIndex
