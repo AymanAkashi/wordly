@@ -49,7 +49,7 @@ const page = ({ params }: { params: { mode: string } }) => {
             mode: mode,
             avatar: user.imageUrl,
         });
-        socket.on("joined", (data) => {
+        socket.on("joined", (data: any) => {
             console.log("data was recv: ", data);
             const { players, room, word } = data;
             setUsers(players);

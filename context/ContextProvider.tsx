@@ -4,31 +4,132 @@ import { rows, wordLength } from "@/constants/constent";
 import { GameState, MyCells } from "@/lib/types";
 import React, { createContext, useEffect, useState } from "react";
 
-export const GameContext = createContext({
-    word: "",
-    setWord: (word: string) => {},
-    grid: Array.from({ length: rows }, () =>
+export type changeType =
+    | "grid"
+    | "currentRowIndex"
+    | "currentCharIndex"
+    | "guess"
+    | "modal"
+    | "game"
+    | "notif"
+    | "timer"
+    | "heart"
+    | "word"
+    | "socket";
+export class GameWordly {
+    word = "";
+    grid = new Array(rows).fill(
         Array(wordLength).fill({ key: "", value: "no" }),
-    ),
-    setGrid: (grid: MyCells[][]) => {},
-    currentRowIndex: 0,
-    setCurrentRowIndex: (index: number) => {},
-    currentCharIndex: 0,
-    setCurrentCharIndex: (index: number) => {},
-    guess: "",
-    setGuess: (guess: string) => {},
-    modal: false,
-    setModal: (modal: boolean) => {},
-    game: "on" as GameState,
-    setGame: (game: GameState) => {},
-    notif: "",
-    setNotif: (error: string) => {},
-    timer: 0,
-    setTimer: (timer: number) => {},
-    heart: 3,
-    setHeart: (heart: number) => {},
-    socket,
-});
+    );
+    currentRowIndex = 0;
+    currentCharIndex = 0;
+    guess = "";
+    modal = false;
+    game = "on";
+    notif = "";
+    timer = -1;
+    heart = 3;
+    socket = null;
+    constructor(
+        wordOrGameWordly?: string | GameWordly,
+        wordLen?: number,
+        time?: number,
+    ) {
+        if (typeof wordOrGameWordly === "string") {
+            // Assuming 'rows' and 'wordLength' are defined somewhere
+            this.word = wordOrGameWordly;
+            this.grid = new Array(rows).fill(
+                Array(wordLen).fill({ key: "", value: "no" }),
+            );
+            this.timer = time ?? -1;
+        } else if (wordOrGameWordly instanceof GameWordly) {
+            // Copy constructor functionality
+            const gameWordly = wordOrGameWordly;
+            this.word = gameWordly.word;
+            this.grid = gameWordly.grid.map((row) => [...row]);
+            this.currentRowIndex = gameWordly.currentRowIndex;
+            this.currentCharIndex = gameWordly.currentCharIndex;
+            this.guess = gameWordly.guess;
+            this.modal = gameWordly.modal;
+            this.game = gameWordly.game;
+            this.notif = gameWordly.notif;
+            this.timer = gameWordly.timer;
+            this.heart = gameWordly.heart;
+            this.socket = gameWordly.socket;
+        } else {
+            // Default initialization if no or invalid parameters are provided
+            this.grid = new Array(rows).fill(
+                Array(wordLength).fill({ key: "", value: "no" }),
+            );
+        }
+    }
+    reset() {
+        this.word = "";
+        this.grid = new Array(rows).fill(
+            Array(wordLength).fill({ key: "", value: "no" }),
+        );
+        this.currentRowIndex = 0;
+        this.currentCharIndex = 0;
+        this.guess = "";
+        this.modal = false;
+        this.game = "on";
+        this.notif = "";
+        this.timer = -1;
+        this.heart = 3;
+        this.socket = null;
+    }
+    update(type: changeType, value: any) {
+        switch (type) {
+            case "word":
+                this.word = value;
+                break;
+            case "grid":
+                this.grid = value;
+                break;
+            case "currentRowIndex":
+                this.currentRowIndex = value;
+                break;
+            case "currentCharIndex":
+                this.currentCharIndex = value;
+                break;
+            case "guess":
+                this.guess = value;
+                break;
+            case "modal":
+                this.modal = value;
+                break;
+            case "game":
+                this.game = value;
+                break;
+            case "notif":
+                this.notif = value;
+                break;
+            case "timer":
+                this.timer = value;
+                break;
+            case "heart":
+                this.heart = value;
+                break;
+            case "socket":
+                this.socket = value;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+interface GameContextType {
+    wordly: GameWordly;
+    setWordly: (wordly: GameWordly) => void;
+    socket: typeof socket;
+}
+
+export const GameContext = createContext({
+    wordly: new GameWordly("", wordLength, -1),
+    setWordly: () => {},
+    socket: socket,
+} as GameContextType);
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
@@ -49,46 +150,10 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
             socket.off("disconnect", onDisconnect);
         };
     }, []);
-    const [word, setWord] = useState<string>("");
-
-    const [grid, setGrid] = useState<MyCells[][]>(
-        Array.from({ length: rows }, () =>
-            Array(wordLength).fill({ key: "", value: "no" }),
-        ),
-    );
-    const [currentRowIndex, setCurrentRowIndex] = useState(0);
-    const [currentCharIndex, setCurrentCharIndex] = useState(0);
-    const [guess, setGuess] = useState("");
-    const [modal, setModal] = useState(false);
-    const [game, setGame] = useState<GameState>("on");
-    const [notif, setNotif] = useState("");
-    const [heart, setHeart] = useState(3);
-    const [timer, setTimer] = useState(-1);
+    const [wordly, setWordly] = useState(new GameWordly("", wordLength, -1));
     return (
         <GameContext.Provider
-            value={{
-                word,
-                setWord,
-                grid,
-                setGrid,
-                currentRowIndex,
-                setCurrentRowIndex,
-                currentCharIndex,
-                setCurrentCharIndex,
-                guess,
-                setGuess,
-                modal,
-                setModal,
-                game,
-                setGame,
-                notif,
-                setNotif,
-                heart,
-                setHeart,
-                timer,
-                setTimer,
-                socket,
-            }}
+            value={{ wordly: wordly, setWordly: setWordly, socket }}
         >
             {children}
         </GameContext.Provider>

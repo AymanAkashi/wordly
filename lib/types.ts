@@ -14,3 +14,16 @@ export type userType = {
     user: string;
     avatar: string;
 };
+
+interface WordlyContextType {
+    word: string;
+    setWord: (word: string) => void;
+    cells: MyCells[];
+    setCells: (cells: MyCells[]) => void;
+    gameState: GameState;
+    setGameState: (gameState: GameState) => void;
+    mode: Mode;
+    setMode: (mode: Mode) => void;
+    user: userType;
+    setUser: (user: userType) => void;
+}

@@ -1,12 +1,20 @@
+import { GameWordly } from "@/context/ContextProvider";
 import { rows, wordLength } from "./constent";
 import { Cell, MyCells } from "@/lib/types";
+import { update, updateAll } from "@/app/Game";
 
 const updateGrid = (
     prev: MyCells[][],
     value: Cell,
     indx: { row: number; col: number },
 ) => {
-    const newGrid = [...prev];
+    const newGrid = new Array(rows).fill(Array(wordLength).fill({}));
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < wordLength; j++) {
+            newGrid[i][j] = { ...prev[i][j] };
+        }
+    }
+    console.log("rows: ", rows, " wordLength: ", wordLength);
     newGrid[indx.row][indx.col] = newGrid[indx.row][indx.col] = {
         ...newGrid[indx.row][indx.col],
         value: value,
@@ -29,23 +37,24 @@ const updateColors = (key: string, color: string) => {
 const checkMatch = (
     word: string[],
     guess: string[],
-    setGrid: (prev: any) => void,
-    currentRowIndex: number,
+    wordly: GameWordly,
+    setWordly: any,
 ) => {
     let i = 0;
+    const newGrid = wordly.grid;
     const interval = setInterval(() => {
-        const element = document.getElementById(`${currentRowIndex}-${i}`);
+        const element = document.getElementById(
+            `${wordly.currentRowIndex}-${i}`,
+        );
         if (element) {
             element.style.animation = "cell-win 0.5s";
         }
         const last = i;
         if (word[i] === guess[i]) {
-            setGrid((prevGrid: any) => {
-                return updateGrid(prevGrid, "yes", {
-                    row: currentRowIndex,
-                    col: last,
-                });
-            });
+            newGrid[wordly.currentRowIndex][last] = {
+                ...newGrid[wordly.currentRowIndex][last],
+                value: "yes",
+            };
             updateColors(word[i], "bg-green-500");
             word[i] = " ";
             guess[i] = ".";
@@ -53,24 +62,21 @@ const checkMatch = (
             word.includes(guess[i]) &&
             word[word.indexOf(guess[i])] !== guess[word.indexOf(guess[i])]
         ) {
-            setGrid((prevGrid: any) => {
-                return updateGrid(prevGrid, "check", {
-                    row: currentRowIndex,
-                    col: last,
-                });
-            });
+            newGrid[wordly.currentRowIndex][last] = {
+                ...newGrid[wordly.currentRowIndex][last],
+                value: "check",
+            };
             updateColors(guess[i], "bg-yellow-500");
             word[word.indexOf(guess[i])] = " ";
             guess[i] = ".";
         } else {
-            setGrid((prevGrid: any) => {
-                return updateGrid(prevGrid, "no", {
-                    row: currentRowIndex,
-                    col: last,
-                });
-            });
+            newGrid[wordly.currentRowIndex][last] = {
+                ...newGrid[wordly.currentRowIndex][last],
+                value: "no",
+            };
             updateColors(guess[i], "bg-red-500");
         }
+        update(setWordly, "grid", newGrid);
         if (i === wordLength - 1) {
             clearInterval(interval);
         } else i++;
@@ -78,25 +84,16 @@ const checkMatch = (
 };
 
 export const setupGrid = ({
-    word,
-    guess,
-    setGame,
-    setModal,
-    setGrid,
-    currentRowIndex,
+    wordly,
+    setWordly,
 }: {
-    word: string;
-    guess: string;
-    setGame: any;
-    setModal: any;
-    setGrid: (prev: any) => void;
-    currentRowIndex: number;
+    wordly: any;
+    setWordly: any;
 }) => {
-    if (word === guess) {
-        setGame("win");
-        setModal(true);
+    if (wordly.word === wordly.guess) {
+        updateAll(setWordly, ["game", "modal"], ["win", true]);
         for (let i = 0; i < wordLength; i++) {
-            const key = document.getElementById(`kbd-${word[i]}`);
+            const key = document.getElementById(`kbd-${wordly.word[i]}`);
             if (key) {
                 key.classList.remove("bg-yellow-500");
                 key.classList.add("bg-green-500");
@@ -105,35 +102,37 @@ export const setupGrid = ({
         let time = 0;
         const interval = setInterval(() => {
             const element = document.getElementById(
-                `${currentRowIndex}-${time}`,
+                `${wordly.currentRowIndex}-${time}`,
             );
             if (element) {
                 element.style.animation = "cell-win 0.5s";
             }
-            const last = time;
-            setGrid((prevGrid: any) => {
-                const newGrid = [...prevGrid];
-                return updateGrid(newGrid, "yes", {
-                    row: currentRowIndex,
-                    col: last,
-                });
-            });
+            // const last = time;
+            const newGrid = wordly.grid;
+            newGrid[wordly.currentRowIndex][time] = {
+                ...newGrid[wordly.currentRowIndex][time],
+                value: "yes",
+            };
+            update(setWordly, "grid", newGrid);
             if (time === wordLength - 1) {
-                setGrid((prevGrid: any) => {
-                    console.log("prevGrid: ", prevGrid);
-                    return prevGrid;
-                });
                 clearInterval(interval);
             } else time++;
         }, 200);
         return true;
     }
-    const tmp = word.split("");
-    checkMatch(word.split(""), guess.split(""), setGrid, currentRowIndex);
-
-    if (currentRowIndex === rows - 1) {
-        setGame("lose");
+    const tmp = wordly.word.split("");
+    checkMatch(
+        wordly.word.split(""),
+        wordly.guess.split(""),
+        wordly,
+        setWordly,
+    );
+    wordly.update("guess", "");
+    console.log("grid: ", wordly.grid);
+    if (wordly.currentRowIndex === rows - 1) {
+        wordly.update("game", "lose");
         // setModal(true);
     }
+    setWordly(wordly);
     return false;
 };

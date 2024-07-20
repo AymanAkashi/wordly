@@ -4,34 +4,10 @@ import { generateWord } from "../actions/generateWord";
 import Cells from "@/components/cells";
 import { validWord } from "./valid-word";
 import { setupGrid } from "./setup-game";
+import { update, updateAll } from "@/app/Game";
+import { GameWordly } from "@/context/ContextProvider";
 
-export const resetGame = ({
-    setGrid,
-    setGuess,
-    setWord,
-    setGame,
-    setCurrentCharIndex,
-    setCurrentRowIndex,
-    setNotif,
-    setTimer,
-    setHeart,
-}: {
-    setGrid: (prevGrid: MyCells[][]) => void;
-    setGuess: (guess: string) => void;
-    setWord: (word: string) => void;
-    setGame: (game: "on" | "win" | "lose") => void;
-    setCurrentCharIndex: (index: number) => void;
-    setCurrentRowIndex: (index: number) => void;
-    setNotif: (error: string) => void;
-    setTimer: (timer: number) => void;
-    setHeart: (heart: number) => void;
-}) => {
-    setGrid(
-        Array.from({ length: rows }, () =>
-            Array(wordLength).fill({ key: "", value: "no" }),
-        ),
-    );
-
+export const resetGame = ({ setWordly }: { setWordly: any }) => {
     for (let i = 0; i < 26; i++) {
         const key = document.getElementById(
             `kbd-${String.fromCharCode(97 + i)}`,
@@ -44,82 +20,72 @@ export const resetGame = ({
             key.classList.remove("bg-yellow-500");
         }
     }
-    setTimer(-1);
-    setHeart(3);
-    setGuess("");
-    setGame("on");
-    generateWord(wordLength).then((data) => setWord(data));
-    setCurrentCharIndex(0);
-    setCurrentRowIndex(0);
-    setNotif("");
+    setWordly((prev: any) => {
+        const newWordly = new GameWordly(prev);
+        newWordly.reset();
+        return newWordly;
+    });
 };
 
 export const moveNextCell = ({
+    wordly,
+    setWordly,
     currentRowIndex,
-    setCurrentRowIndex,
-    setCurrentCharIndex,
-    setGame,
-    setModal,
 }: {
+    wordly: any;
+    setWordly: any;
     currentRowIndex: number;
-    setCurrentRowIndex: (index: number) => void;
-    setCurrentCharIndex: (index: number) => void;
-    setGame: (game: "on" | "win" | "lose") => void;
-    setModal: (modal: boolean) => void;
 }) => {
     if (currentRowIndex === rows - 1) {
-        setGame("lose");
-        // setModal(true);
-        setCurrentRowIndex(rows);
+        updateAll(
+            setWordly,
+            ["game", "currentRowIndex", "modal"],
+            ["lose", -1, true],
+        );
         return;
     } else {
-        setCurrentRowIndex(currentRowIndex + 1);
+        update(setWordly, "currentRowIndex", currentRowIndex + 1);
     }
-    setCurrentCharIndex(0);
+    update(setWordly, "currentCharIndex", 0);
+    console.log(wordly.currentRowIndex, " ", wordly.currentCharIndex);
+    console.log(
+        "moving: ",
+        wordly.grid[0],
+        " ",
+        wordly.grid[1],
+        " ",
+        wordly.grid[2],
+    );
 };
 
 export const DeleteLetter = ({
-    guess,
-    setGuess,
-    currentCharIndex,
-    setCurrentCharIndex,
-    currentRowIndex,
-    setGrid,
+    wordly,
+    setWordly,
 }: {
-    guess: string;
-    setGuess: any;
-    currentCharIndex: number;
-    setCurrentCharIndex: any;
-    currentRowIndex: number;
-    setGrid: any;
+    wordly: any;
+    setWordly: any;
 }) => {
-    if (guess.length > 0) {
-        setGuess((prevGuess: string) => {
-            if (prevGuess.length === 1) {
-                return "";
-            }
-            return prevGuess.slice(0, -1);
-        });
+    const myNewWordly = new GameWordly(wordly);
+    if (wordly.guess.length > 0) {
+        update(setWordly, "guess", wordly.guess.slice(0, -1));
     }
-
-    if (currentCharIndex > 0) {
-        setGrid((prevGrid: MyCells[][]) => {
-            const newGrid = [...prevGrid];
-            newGrid[currentRowIndex][
-                currentCharIndex - 1 > 0 ? currentCharIndex - 1 : 0
-            ] = {
-                key: "",
-                value: "no",
-            };
-            return newGrid;
-        });
-        setCurrentCharIndex((prevCharIndex: number) =>
-            prevCharIndex - 1 > 0 ? prevCharIndex - 1 : 0,
+    if (wordly.currentCharIndex > 0) {
+        const newGrid = myNewWordly.grid;
+        newGrid[wordly.currentRowIndex][
+            wordly.currentCharIndex - 1 > 0 ? wordly.currentCharIndex - 1 : 0
+        ] = {
+            key: "",
+            value: "no",
+        };
+        updateAll(
+            setWordly,
+            ["grid", "currentCharIndex"],
+            [newGrid, wordly.currentCharIndex - 1],
         );
     }
     const cell = document.getElementById(
-        `${currentRowIndex}-${
-            currentCharIndex - 1 > 0 ? currentCharIndex - 1 : 0
+        `${wordly.currentRowIndex}-${
+            wordly.currentCharIndex - 1 > 0 ? wordly.currentCharIndex - 1 : 0
         }`,
     );
     if (cell) {
@@ -129,32 +95,28 @@ export const DeleteLetter = ({
 };
 
 export const AddLetter = ({
+    wordly,
+    setWordly,
     newChar,
-    currentRowIndex,
-    currentCharIndex,
-    setGrid,
-    setGuess,
-    setCurrentCharIndex,
 }: {
+    wordly: any;
+    setWordly: any;
     newChar: string;
-    currentRowIndex: number;
-    currentCharIndex: number;
-    setGrid: any;
-    setGuess: any;
-    setCurrentCharIndex: any;
 }) => {
-    setGrid((prevGrid: MyCells[][]) => {
-        const newGrid = [...prevGrid];
-        newGrid[currentRowIndex][currentCharIndex] = {
-            key: newChar,
-            value: "no",
-        };
-        return newGrid;
-    });
-    setGuess((prevGuess: string) => prevGuess + newChar);
-    setCurrentCharIndex((prevCharIndex: number) => prevCharIndex + 1);
+    // const myNewWordly = new GameWordly(wordly);
+    const newGrid = wordly.grid;
+    newGrid[wordly.currentRowIndex][wordly.currentCharIndex] = {
+        key: newChar,
+        value: "no",
+    };
+    update(setWordly, "grid", newGrid);
+    updateAll(
+        setWordly,
+        ["guess", "currentCharIndex"],
+        [wordly.guess + newChar, wordly.currentCharIndex + 1],
+    );
     const cell = document.getElementById(
-        `${currentRowIndex}-${currentCharIndex}`,
+        `${wordly.currentRowIndex}-${wordly.currentCharIndex}`,
     );
     if (cell) {
         cell.style.animation = "shake 0.5s";
@@ -162,57 +124,41 @@ export const AddLetter = ({
 };
 
 export const handleWord = async ({
-    word,
-    guess,
-    setGame,
-    setModal,
-    setGrid,
-    currentRowIndex,
-    setCurrentRowIndex,
-    setCurrentCharIndex,
-    setNotif,
-    setGuess,
-    setHeart,
+    wordly,
+    setWordly,
+    validWord,
 }: {
-    word: string;
-    guess: string;
-    setGame: any;
-    setModal: any;
-    setGrid: any;
-    currentRowIndex: number;
-    setCurrentRowIndex: any;
-    setCurrentCharIndex: any;
-    setNotif: any;
-    setGuess: any;
-    setHeart: any;
+    wordly: any;
+    setWordly: any;
+    validWord: any;
 }) => {
-    if (guess.length !== wordLength) {
-        setNotif("Word length is not correct");
+    if (wordly.guess.length !== wordLength) {
+        update(setWordly, "notif", "Word is not complete");
         return;
-    }
-    if (!(await validWord(guess)) && word !== guess) {
-        setNotif("Word is not correct you lose a heart❤️");
-        setHeart((prevHeart: number) => prevHeart - 1);
+    } else if (
+        !(await validWord(wordly.guess)) &&
+        wordly.word !== wordly.guess
+    ) {
+        updateAll(
+            setWordly,
+            ["notif", "heart"],
+            ["Word is not valid", wordly.heart - 1],
+        );
         return;
     }
     if (
         setupGrid({
-            word,
-            guess,
-            setGame,
-            setModal,
-            setGrid,
-            currentRowIndex,
+            wordly,
+            setWordly,
         })
     ) {
         return;
     }
-    setGuess("");
+    update(setWordly, "guess", "");
     moveNextCell({
-        currentRowIndex,
-        setCurrentRowIndex,
-        setCurrentCharIndex,
-        setGame,
-        setModal,
+        wordly,
+        setWordly,
+        currentRowIndex: wordly.currentRowIndex,
     });
+    console.log(wordly.grid[0], " ", wordly.grid[1], " ", wordly.grid[2]);
 };

@@ -1,12 +1,13 @@
+import { GameWordly } from "@/context/ContextProvider";
 import React, { useEffect, useState } from "react";
 
 export const ErrorDialog = ({
     message,
-    setError,
+    setWordly,
     timeout = 2000,
 }: {
     message: string;
-    setError: (error: string) => void;
+    setWordly: any;
     timeout?: number;
 }) => {
     const [count, setCount] = useState(0);
@@ -14,7 +15,11 @@ export const ErrorDialog = ({
         const interval = setInterval(() => {
             setCount(count + 100);
             if (count >= timeout) {
-                setError("");
+                setWordly((prev: any) => {
+                    const newWordly = new GameWordly(prev);
+                    newWordly.update("notif", "");
+                    return newWordly;
+                });
                 clearInterval(interval);
             }
         }, 100);

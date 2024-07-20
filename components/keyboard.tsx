@@ -1,3 +1,4 @@
+import { update } from "@/app/Game";
 import { rows, wordLength } from "@/constants/constent";
 import {
     AddLetter,
@@ -11,68 +12,45 @@ import { GameContext } from "@/context/ContextProvider";
 import { cn } from "@/lib/utils";
 import React, { useContext } from "react";
 
-const Keyboard = () => {
-    const {
-        guess,
-        setGrid,
-        currentCharIndex,
-        currentRowIndex,
-        setGuess,
-        setCurrentCharIndex,
-        setCurrentRowIndex,
-        word,
-        setGame,
-        setModal,
-        setNotif,
-        game,
-        setHeart,
-    } = useContext(GameContext);
+const Keyboard = ({ mode }: { mode: string }) => {
+    const { wordly, setWordly } = useContext(GameContext);
 
     const handleClick = (e: any) => {
-        if (game !== "on") return;
+        if (wordly.timer === -1)
+            update(
+                setWordly,
+                "timer",
+                mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180,
+            );
+        if (wordly.game !== "on") return;
         const newChar = e.target.innerText.toLowerCase();
-        if (guess.length >= wordLength) {
+        if (wordly.guess.length >= wordLength) {
             return;
         }
         AddLetter({
+            wordly,
+            setWordly,
             newChar,
-            currentRowIndex,
-            currentCharIndex,
-            setGrid,
-            setGuess,
-            setCurrentCharIndex,
         });
     };
     const handleEnter = () => {
-        if (game !== "on") return;
+        if (wordly.game !== "on") return;
         handleWord({
-            word,
-            guess,
-            setGame,
-            setModal,
-            setGrid,
-            currentRowIndex,
-            setCurrentRowIndex,
-            setCurrentCharIndex,
-            setNotif,
-            setGuess,
-            setHeart,
+            wordly,
+            setWordly,
+            validWord,
         });
     };
     const handleDelete = () => {
-        if (game !== "on") return;
+        if (wordly.game !== "on") return;
         DeleteLetter({
-            guess,
-            setGuess,
-            currentCharIndex,
-            setCurrentCharIndex,
-            currentRowIndex,
-            setGrid,
+            wordly,
+            setWordly,
         });
     };
 
     const kbdStyle =
-        "cursor-pointer hover:scale-90 capitalize font-sans text-lg p-1 sm:rounded-md shadow-sm  transition-all duration-100 delay-75 hover:shadow-lg hover:bg-sky-500 hover:text-white dark:text-white select-none text-black  flex justify-center items-center border-b-2 border-gray-800/50 border-[0.5px] w-7 py-3 text-sm rounded-sm sm:w-12 sm:text-md xl:w-14 xl:text-lg";
+        "cursor-pointer hover:scale-90 capitalize font-sans text-lg p-1 sm:rounded-md shadow-sm  transition-all duration-100 delay-75 hover:shadow-lg hover:bg-sky-500 hover:text-white dark:text-white select-none text-black  flex justify-center items-center border-b-2 border-gray-800/50 border-[0.5px] w-7 py-3 text-sm rounded-sm sm:w-12 sm:text-md xl:w-14 xl:text-lg h-auto";
     return (
         <div className="flex flex-col justify-normal items-center w-full">
             <div className="flex justify-center gap-1 my-1">
@@ -138,7 +116,7 @@ const Keyboard = () => {
                 <kbd
                     className={cn(
                         kbdStyle,
-                        "min-w-auto px-8 border-b-2 border-gray-800/50"
+                        "min-w-auto px-8 border-b-2 border-gray-800/50",
                     )}
                     onClick={handleEnter}
                     id="kbd-enter"
@@ -171,7 +149,7 @@ const Keyboard = () => {
                 <kbd
                     className={cn(
                         kbdStyle,
-                        "border-b-2 border-gray-800/50 w-10"
+                        "border-b-2 border-gray-800/50 w-10",
                     )}
                     onClick={handleDelete}
                     id="kbd-delete"
