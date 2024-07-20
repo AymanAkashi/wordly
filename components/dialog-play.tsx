@@ -14,18 +14,8 @@ import { GiConsoleController } from "react-icons/gi";
 import Image from "next/image";
 
 const DialogPlay = () => {
-    const {
-        game,
-        setGrid,
-        setGuess,
-        setCurrentRowIndex,
-        setCurrentCharIndex,
-        setWord,
-        setGame,
-        setNotif,
-        setTimer,
-        setHeart,
-    } = useContext(GameContext);
+    const { wordly, setWordly } = useContext(GameContext);
+    const [game, setGame] = useState(wordly.game);
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -70,15 +60,7 @@ const DialogPlay = () => {
                         className="px-2 py-1 bg-emerald-500 hover:scale-105 transition-all duration-100 delay-75 text-white dark:text-black rounded-md hover:text-emerald-500 hover:bg-black dark:bg-white dark:hover:bg-emerald-500 dark:hover:text-black"
                         onClick={() => {
                             resetGame({
-                                setGrid,
-                                setGuess,
-                                setCurrentRowIndex,
-                                setCurrentCharIndex,
-                                setWord,
-                                setGame,
-                                setNotif,
-                                setTimer,
-                                setHeart,
+                                setWordly,
                             });
                         }}
                     >

@@ -4,6 +4,7 @@ import { IoClose } from "react-icons/io5";
 import React, { useContext } from "react";
 import { GameContext } from "@/context/ContextProvider";
 import Link from "next/link";
+import { update } from "@/app/Game";
 
 const RestartGame = (props: {
     winner?: string;
@@ -12,22 +13,9 @@ const RestartGame = (props: {
     mode: string;
     avatar: string;
 }) => {
-    const {
-        word,
-        game,
-        setModal,
-        setWord,
-        setGrid,
-        setGuess,
-        setCurrentRowIndex,
-        setCurrentCharIndex,
-        setGame,
-        setNotif,
-        setTimer,
-        setHeart,
-        socket,
-    } = useContext(GameContext);
+    const { wordly, setWordly, socket } = useContext(GameContext);
     const { winner, room, name, mode, avatar } = props;
+    const { word, game } = wordly;
     return (
         <div className="absolute inset-0 m-auto z-10  flex justify-center items-center ">
             <div className="relative rounded-2xl min-w-72">
@@ -69,15 +57,7 @@ const RestartGame = (props: {
                             className="px-2 py-1 w-full bg-amber-500 hover:scale-105 transition-all duration-100 delay-75 text-white dark:text-black rounded-md hover:text-amber-500 hover:bg-black dark:bg-white dark:hover:bg-amber-500 dark:hover:text-black text-center"
                             onClick={() => {
                                 resetGame({
-                                    setGrid,
-                                    setGuess,
-                                    setCurrentRowIndex,
-                                    setCurrentCharIndex,
-                                    setWord,
-                                    setGame,
-                                    setNotif,
-                                    setTimer,
-                                    setHeart,
+                                    setWordly,
                                 });
                                 socket.emit("rematch", { room });
                             }}
@@ -90,18 +70,10 @@ const RestartGame = (props: {
                             className="px-2 py-1 bg-emerald-500 hover:scale-105 transition-all duration-100 delay-75 text-white dark:text-black rounded-md hover:text-emerald-500 hover:bg-black dark:bg-white dark:hover:bg-emerald-500 dark:hover:text-black w-full text-center"
                             onClick={() => {
                                 resetGame({
-                                    setGrid,
-                                    setGuess,
-                                    setCurrentRowIndex,
-                                    setCurrentCharIndex,
-                                    setWord,
-                                    setGame,
-                                    setNotif,
-                                    setTimer,
-                                    setHeart,
+                                    setWordly,
                                 });
                                 socket.emit("leave-room", { room });
-                                setModal(false);
+                                update(setWordly, "modal", false);
                                 socket.emit("join", {
                                     name,
                                     avatar,

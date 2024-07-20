@@ -17,6 +17,7 @@ import { GameContext } from "@/context/ContextProvider";
 import { setupGrid } from "@/constants/setup-game";
 import Keyboard from "@/components/keyboard";
 import Link from "next/link";
+import { update, updateAll } from "@/app/Game";
 
 const Hearts = ({ heart }: { heart: number }) => {
     return (
@@ -47,35 +48,21 @@ const GameMode = ({
     name: string | null;
     avatar: string;
 }) => {
-    const {
-        word,
-        setWord,
-        grid,
-        setGrid,
-        currentRowIndex,
-        setCurrentRowIndex,
-        currentCharIndex,
-        setCurrentCharIndex,
-        guess,
-        setGuess,
-        modal,
-        setModal,
-        game,
-        setGame,
-        notif,
-        setNotif,
-        heart,
-        setHeart,
-        setTimer,
-        timer,
-    } = useContext(GameContext);
+    const { wordly, setWordly } = useContext(GameContext);
     const [count, setCount] = useState(5);
     const [winner, setWinner] = useState("");
     const [Waiting, setWaiting] = useState(false);
-    if (word != newWord) setWord(newWord);
+    if (wordly.word != newWord) {
+        update(setWordly, "word", newWord);
+    }
     useEffect(() => {
-        if (count === 0)
-            setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
+        if (count === 0) {
+            update(
+                setWordly,
+                "timer",
+                mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180,
+            );
+        }
         const interval = setInterval(() => {
             setCount(count - 1);
         }, 1000);
@@ -83,62 +70,68 @@ const GameMode = ({
     }, [count]);
 
     useEffect(() => {
-        if (timer === -1 && count === 0)
-            setTimer(mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180);
-        if (timer === -1 || game !== "on") return;
-        if (timer === 0 || heart === 0 || currentRowIndex === rows) {
+        if (wordly.timer === -1 && count === 0)
+            update(
+                setWordly,
+                "timer",
+                mode === "1x1" ? 60 : mode === "1x2" ? 120 : 180,
+            );
+        if (wordly.timer === -1 || wordly.game !== "on") return;
+        if (
+            wordly.timer === 0 ||
+            wordly.heart === 0 ||
+            wordly.currentRowIndex === rows
+        ) {
             console.log("lose\n");
             socket.emit("lose", { name, id: socket.id, room: room, mode });
             setWaiting(true);
-            setGame("lose");
+            update(setWordly, "game", "lose");
             return;
         }
         const interval = setInterval(() => {
-            setTimer(timer - 1);
+            update(setWordly, "timer", wordly.timer - 1);
             setCount(count - 1);
         }, 1000);
         return () => clearInterval(interval);
-    }, [timer]);
+    }, [wordly.timer]);
 
     useEffect(() => {
-        if (currentRowIndex === rows || heart <= 0) {
+        if (wordly.currentRowIndex === rows || wordly.heart <= 0) {
             console.log("lose\n");
             socket.emit("lose", { name, id: socket.id, room: room, mode });
             setWaiting(true);
-            setGame("lose");
+            update(setWordly, "game", "lose");
             return;
         }
         socket.on("end", (data: any) => {
-            setGame("lose");
+            updateAll(setWordly, ["game", "modal"], ["lose", true]);
             console.log("data was recv: ", data);
             setWinner(data.name);
-            setModal(true);
         });
         socket.on("lose", (data: any) => {
-            setGame("lose");
+            updateAll(setWordly, ["game", "modal"], ["lose", true]);
             setWaiting(false);
-            setModal(true);
             setWinner("No one");
         });
-        if (game === "win") {
+        if (wordly.game === "win") {
             socket.emit("end", { name, id: socket.id, room: room });
             setWinner("You");
-            setModal(true);
+            update(setWordly, "modal", true);
         }
-        if (word == "") {
+        if (wordly.word == "") {
             generateWord(wordLength).then((data) => {
-                setWord(data);
+                update(setWordly, "word", data);
             });
         }
-        if (currentRowIndex === rows || game !== "on") {
+        if (wordly.currentRowIndex === rows || wordly.game !== "on") {
             return;
         }
         async function handleKeyDown(e: any) {
             if (
                 e.keyCode >= 65 &&
                 e.keyCode <= 90 &&
-                guess.length < wordLength &&
-                currentCharIndex < wordLength
+                wordly.guess.length < wordLength &&
+                wordly.currentCharIndex < wordLength
             ) {
                 const key = document.getElementById("kbd-" + e.key);
                 if (key) {
@@ -152,11 +145,8 @@ const GameMode = ({
                 ).toLocaleLowerCase();
                 AddLetter({
                     newChar,
-                    currentRowIndex,
-                    currentCharIndex,
-                    setGrid,
-                    setGuess,
-                    setCurrentCharIndex,
+                    wordly,
+                    setWordly,
                 });
             } else if (e.key === "Enter") {
                 const key = document.getElementById("kbd-enter");
@@ -167,17 +157,9 @@ const GameMode = ({
                     }, 200);
                 }
                 handleWord({
-                    word,
-                    guess,
-                    setGame,
-                    setModal,
-                    setGrid,
-                    currentRowIndex,
-                    setCurrentRowIndex,
-                    setCurrentCharIndex,
-                    setNotif,
-                    setGuess,
-                    setHeart,
+                    setWordly,
+                    wordly,
+                    validWord,
                 });
             } else if (e.key === "Backspace") {
                 const key = document.getElementById("kbd-delete");
@@ -188,12 +170,8 @@ const GameMode = ({
                     }, 200);
                 }
                 DeleteLetter({
-                    guess,
-                    setGuess,
-                    currentCharIndex,
-                    setCurrentCharIndex,
-                    currentRowIndex,
-                    setGrid,
+                    wordly,
+                    setWordly,
                 });
             }
         }
@@ -202,24 +180,32 @@ const GameMode = ({
         return function cleanup() {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [currentCharIndex, grid, Waiting]);
+    }, [wordly, Waiting]);
 
     return (
         <main className="w-full h-full flex flex-col justify-center items-center mt-8 space-y-8 rel relative border-2 border-yellow-500">
             <div className="grid grid-cols-5 gap-1 relative">
-                {grid.map((row, rowIndex) =>
-                    row.map((char, charIndex) => (
-                        <div key={`${rowIndex}-${charIndex}`}>
-                            <Cells
-                                props={{
-                                    rowIndex,
-                                    charIndex,
-                                    char,
-                                    currentRowIndex,
-                                }}
-                            />
-                        </div>
-                    )),
+                {wordly.grid.map((row, rowIndex) =>
+                    row.map(
+                        (
+                            char: {
+                                key: string;
+                                value: string;
+                            },
+                            charIndex: number,
+                        ) => (
+                            <div key={`${rowIndex}-${charIndex}`}>
+                                <Cells
+                                    props={{
+                                        rowIndex,
+                                        charIndex,
+                                        char,
+                                        currentRowIndex: wordly.currentRowIndex,
+                                    }}
+                                />
+                            </div>
+                        ),
+                    ),
                 )}
                 {count >= 0 && (
                     <div className="countdown absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl text-white bg-black/50 px-4 py-2 rounded-xl">
@@ -232,12 +218,15 @@ const GameMode = ({
                         ></span>
                     </div>
                 )}
-                {notif && (
+                {wordly.notif && (
                     <div className="absolute inset-0 m-auto z-10 flex justify-center items-center">
-                        <ErrorDialog message={notif} setError={setNotif} />
+                        <ErrorDialog
+                            message={wordly.notif}
+                            setWordly={setWordly}
+                        />
                     </div>
                 )}
-                {!modal && Waiting && (
+                {!wordly.modal && Waiting && (
                     <div className="absolute inset-0 m-auto z-10 flex justify-center items-center w-full px-2">
                         <div className="flex justify-center flex-col items-center bg-gradient-to-tr to-black/50 rounded-2xl p-2">
                             <p className="text-4xl  px-2 py-1">
@@ -251,7 +240,7 @@ const GameMode = ({
                         </div>
                     </div>
                 )}
-                {modal && (
+                {wordly.modal && (
                     <RestartGame
                         winner={winner}
                         room={room}
@@ -266,20 +255,20 @@ const GameMode = ({
                     Time left:{" "}
                     <span
                         className={` ${
-                            timer === -1 &&
+                            wordly.timer === -1 &&
                             "underline text-green-800 dark:text-green-400"
                         }`}
                     >
-                        {timer !== -1 ? timer : "Click To start"}
+                        {wordly.timer !== -1 ? wordly.timer : "Click To start"}
                     </span>
                 </span>
-                <Hearts heart={heart} />
+                <Hearts heart={wordly.heart} />
             </div>
-            <Keyboard />
-            {guess.length === wordLength &&
-                guess.length === wordLength &&
-                game === "on" &&
-                !notif && (
+            <Keyboard mode={mode} />
+            {wordly.guess.length === wordLength &&
+                wordly.guess.length === wordLength &&
+                wordly.game === "on" &&
+                !wordly.notif && (
                     <div className="text-lg fixed flex justify-center items-center bg-black/50 shadow-white/20 shadow-md text-white px-2 py-1 rounded-xl">
                         {" "}
                         Press Enter{" "}
